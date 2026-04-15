@@ -1,0 +1,35 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies & build output
+node_modules
+dist
+dist-ssr
+
+# Local environment files (contain secrets — NEVER commit these)
+*.local
+.env
+.env.*.local
+
+# Supabase local dev (Docker volumes, generated types cache)
+supabase/.branches
+supabase/.temp
+supabase/config.toml   # if you have one with local secrets
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

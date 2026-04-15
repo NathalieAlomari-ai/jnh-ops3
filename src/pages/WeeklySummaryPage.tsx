@@ -70,7 +70,7 @@ function SectionContent({ text }: { text: string }) {
           <p
             key={i}
             className={isBullet ? 'flex gap-2' : ''}
-            dangerouslySetInnerHTML={{ __html: isBullet ? `<span class="text-gray-400 flex-shrink-0">•</span><span>${parsed.replace(/^[\s•\-]+/, '')}</span>` : parsed }}
+            dangerouslySetInnerHTML={{ __html: isBullet ? `<span class="text-slate-400 dark:text-slate-500 flex-shrink-0">•</span><span>${parsed.replace(/^[\s•\-]+/, '')}</span>` : parsed }}
           />
         )
       })}
@@ -99,10 +99,10 @@ function SummaryCard({ summary }: { summary: AiSummary }) {
               <Sparkles size={18} className="text-white" />
             </div>
             <div className="min-w-0">
-              <p className="font-semibold text-gray-900 truncate">
+              <p className="font-semibold text-slate-900 dark:text-white truncate">
                 Week of {summary.week_start ? formatWeekRange(summary.week_start, summary.week_end) : '—'}
               </p>
-              <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 flex items-center gap-1">
                 <Clock size={11} />
                 Generated {format(parseISO(summary.created_at), 'MMM d, yyyy · h:mm a')}
                 {summary.triggered_by === 'n8n' && (
@@ -128,7 +128,7 @@ function SummaryCard({ summary }: { summary: AiSummary }) {
         <div id={`summary-body-${summary.id}`}>
           {!hasReport ? (
             <CardBody>
-              <p className="text-sm text-gray-400 italic">
+              <p className="text-sm text-slate-400 dark:text-slate-500 italic">
                 {summary.status === 'error'
                   ? 'Generation failed. Try regenerating this week.'
                   : summary.status === 'generating'
@@ -136,7 +136,7 @@ function SummaryCard({ summary }: { summary: AiSummary }) {
                   : 'No structured report content available for this entry.'}
               </p>
               {summary.content && (
-                <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
                   <p className="text-sm text-gray-600 whitespace-pre-wrap">{summary.content}</p>
                 </div>
               )}
@@ -174,11 +174,11 @@ function GeneratingCard() {
             <Loader2 size={14} className="text-blue-500 animate-spin flex-shrink-0" />
             <p className="text-sm font-semibold text-gray-900">Generating weekly summary…</p>
           </div>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
             Claude is analysing standups, tasks, and initiatives. This usually takes 10–20 seconds.
           </p>
           {/* Progress bar */}
-          <div className="mt-3 h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+          <div className="mt-3 h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div className="h-full bg-blue-400 rounded-full animate-[pulse_1.5s_ease-in-out_infinite] w-3/4" />
           </div>
         </div>
@@ -193,8 +193,8 @@ function EmptyState({ onGenerate }: { onGenerate: () => void }) {
       <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
         <Sparkles size={28} className="text-blue-400" />
       </div>
-      <h3 className="text-base font-semibold text-gray-900 mb-1">No summaries yet</h3>
-      <p className="text-sm text-gray-500 max-w-xs mb-6">
+      <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">No summaries yet</h3>
+      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mb-6">
         Generate your first weekly report. Claude will analyse standups, tasks, and strategic initiatives.
       </p>
       <Button id="empty-generate-btn" onClick={onGenerate} variant="primary">
@@ -238,7 +238,7 @@ export default function WeeklySummaryPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Weekly Summary</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             AI-generated reports covering standups, tasks, strategy, and risks.
           </p>
         </div>
@@ -262,14 +262,14 @@ export default function WeeklySummaryPage() {
       {/* ── Week Selector ── */}
       <Card>
         <CardBody className="flex items-center gap-4 py-3">
-          <Calendar size={16} className="text-gray-400 flex-shrink-0" />
-          <span className="text-sm text-gray-500 font-medium">Week</span>
+          <Calendar size={16} className="text-slate-400 dark:text-slate-500 flex-shrink-0" />
+          <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">Week</span>
 
           <div className="flex items-center gap-2">
             <button
               id="week-prev-btn"
               onClick={prevWeek}
-              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="p-1.5 rounded-lg hover:bg-slate-100 dark:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               aria-label="Previous week"
             >
               <ChevronLeft size={16} />
@@ -288,7 +288,7 @@ export default function WeeklySummaryPage() {
               id="week-next-btn"
               onClick={nextWeek}
               disabled={isCurrentOrFuture}
-              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="p-1.5 rounded-lg hover:bg-slate-100 dark:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               aria-label="Next week"
             >
               <ChevronRight size={16} />
@@ -319,7 +319,7 @@ export default function WeeklySummaryPage() {
       {!isGenerating && !existingSummary && !listLoading && (
         <Card>
           <CardBody className="py-3">
-            <p className="text-sm text-gray-400 text-center">
+            <p className="text-sm text-slate-400 dark:text-slate-500 text-center">
               No summary generated for this week yet. Click "Generate Now" to create one.
             </p>
           </CardBody>
@@ -328,14 +328,14 @@ export default function WeeklySummaryPage() {
 
       {/* ── Past Summaries list ── */}
       <div>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
           All Summaries
         </h2>
 
         {listLoading && (
           <div className="space-y-3">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+              <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
             ))}
           </div>
         )}

@@ -29,6 +29,27 @@ export function useUpdateProfile() {
       if (error) throw error
       return data as Profile
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['profiles'] }),
+
+    // ── Optimistic update: patch the cache immediately, revert on error ──
+    onMutate: async ({ id, updates }) => {
+      await queryClient.cancelQueries({ queryKey: ['profiles'] })
+      const previous = queryClient.getQueryData<Profile[]>(['profiles'])
+
+      queryClient.setQueryData<Profile[]>(['profiles'], old =>
+        old?.map(p => (p.id === id ? { ...p, ...updates } : p)) ?? old
+      )
+
+      return { previous }
+    },
+
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['profiles'], context.previous)
+      }
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['profiles'] })
+    },
   })
 }

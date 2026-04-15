@@ -61,25 +61,25 @@ function TaskForm({ initial, onClose }: { initial?: Partial<ShmTask>; onClose: (
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Title *</label>
         <input required className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Description</label>
         <textarea rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Status</label>
           <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as TaskStatus }))}>
             {STATUSES.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Priority</label>
           <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value as TaskPriority }))}>
             {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
@@ -88,20 +88,20 @@ function TaskForm({ initial, onClose }: { initial?: Partial<ShmTask>; onClose: (
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Assignee</label>
           <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={form.assignee_id} onChange={e => setForm(f => ({ ...f, assignee_id: e.target.value }))}>
             {profiles?.map(p => <option key={p.id} value={p.id}>{p.full_name}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Due Date</label>
           <input type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={form.due_date} onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))} />
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Initiative</label>
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Initiative</label>
         <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={form.initiative_id} onChange={e => setForm(f => ({ ...f, initiative_id: e.target.value }))}>
           <option value="">— None —</option>
@@ -144,7 +144,7 @@ export default function TasksPage() {
           <button key={s}
             onClick={() => setFilterStatus(s)}
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              filterStatus === s ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              filterStatus === s ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-gray-600 hover:bg-gray-200'
             }`}
           >
             {s.replace('_', ' ')}
@@ -152,7 +152,7 @@ export default function TasksPage() {
         ))}
       </div>
 
-      {isLoading ? <p className="text-gray-400 text-sm">Loading…</p> : (
+      {isLoading ? <p className="text-slate-400 dark:text-slate-500 text-sm">Loading…</p> : (
         <div className="space-y-2">
           {filtered.map(task => (
             <Card key={task.id}>
@@ -163,7 +163,7 @@ export default function TasksPage() {
                     <Badge variant={statusColors[task.status]}>{task.status.replace('_', ' ')}</Badge>
                     <Badge variant={priorityColors[task.priority]}>{task.priority}</Badge>
                   </div>
-                  {task.description && <p className="text-sm text-gray-500 mt-1">{task.description}</p>}
+                  {task.description && <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{task.description}</p>}
                   <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
                     <span>{task.profiles.full_name}</span>
                     {task.due_date && <span>Due: {format(new Date(task.due_date + 'T12:00:00'), 'MMM d')}</span>}
@@ -174,7 +174,7 @@ export default function TasksPage() {
                     <select
                       value={task.status}
                       onChange={e => updateTask.mutate({ id: task.id, updates: { status: e.target.value as TaskStatus } })}
-                      className="text-xs border border-gray-200 rounded-md px-2 py-1 focus:outline-none"
+                      className="text-xs border border-gray-200 dark:border-slate-700 rounded-md px-2 py-1 focus:outline-none"
                     >
                       {STATUSES.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
                     </select>
@@ -193,7 +193,7 @@ export default function TasksPage() {
               </CardBody>
             </Card>
           ))}
-          {!filtered.length && <p className="text-center text-gray-400 py-12 text-sm">No tasks found</p>}
+          {!filtered.length && <p className="text-center text-slate-400 dark:text-slate-500 py-12 text-sm">No tasks found</p>}
         </div>
       )}
 

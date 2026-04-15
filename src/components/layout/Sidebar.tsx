@@ -10,8 +10,11 @@ import {
   Package,
   ShieldCheck,
   LogOut,
+  Sun,
+  Moon,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useTheme } from '@/contexts/ThemeContext'
 import { clsx } from 'clsx'
 
 // ─── Nav group config ─────────────────────────────────────────────────────────
@@ -21,8 +24,8 @@ const WORKSPACE_ITEMS = [
 ]
 
 const OPERATIONS_ITEMS = [
-  { to: '/projects',  label: 'Projects',    icon: Briefcase    },
-  { to: '/tasks',     label: 'Task Board',  icon: SquareKanban },
+  { to: '/projects',  label: 'Projects',   icon: Briefcase    },
+  { to: '/tasks',     label: 'Task Board', icon: SquareKanban },
 ]
 
 const PIPELINE_ITEMS = [
@@ -58,6 +61,7 @@ function NavGroup({ label, children }: { label: string; children: React.ReactNod
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
 export default function Sidebar() {
   const { profile, isAdmin, signOut } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <aside className="w-64 min-h-screen bg-slate-900 flex flex-col border-r border-slate-800">
@@ -121,9 +125,47 @@ export default function Sidebar() {
 
       </nav>
 
-      {/* ── User footer ── */}
-      <div className="px-3 py-4 border-t border-slate-800 space-y-1">
-        <div className="flex items-center gap-3 px-3 py-2">
+      {/* ── Footer: Theme toggle + User ── */}
+      <div className="px-3 py-4 border-t border-slate-800 space-y-2">
+
+        {/* Theme Toggle */}
+        <button
+          id="theme-toggle-btn"
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+        >
+          <div className="relative w-4 h-4">
+            <Sun
+              size={16}
+              strokeWidth={2}
+              className={`absolute inset-0 transition-all duration-300 ${
+                theme === 'dark' ? 'opacity-100 rotate-0' : 'opacity-0 rotate-90'
+              }`}
+            />
+            <Moon
+              size={16}
+              strokeWidth={2}
+              className={`absolute inset-0 transition-all duration-300 ${
+                theme === 'light' ? 'opacity-100 rotate-0' : 'opacity-0 -rotate-90'
+              }`}
+            />
+          </div>
+          <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+
+          {/* Pill indicator */}
+          <div className={`ml-auto w-8 h-4 rounded-full transition-colors flex items-center px-0.5 ${
+            theme === 'dark' ? 'bg-blue-600 justify-end' : 'bg-slate-600 justify-start'
+          }`}>
+            <div className="w-3 h-3 rounded-full bg-white shadow-sm" />
+          </div>
+        </button>
+
+        {/* Divider */}
+        <div className="border-t border-slate-800 mx-1" />
+
+        {/* User info */}
+        <div className="flex items-center gap-3 px-3 py-1.5">
           <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
             {profile?.full_name?.charAt(0)?.toUpperCase() ?? '?'}
           </div>
@@ -132,6 +174,8 @@ export default function Sidebar() {
             <p className="text-xs text-slate-400 capitalize">{profile?.role}</p>
           </div>
         </div>
+
+        {/* Sign out */}
         <button
           onClick={signOut}
           className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
@@ -139,8 +183,8 @@ export default function Sidebar() {
           <LogOut size={16} strokeWidth={2} />
           Sign out
         </button>
-      </div>
 
+      </div>
     </aside>
   )
 }

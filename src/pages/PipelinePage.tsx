@@ -73,38 +73,38 @@ function DealForm({ initial, defaultStage, onClose }: {
   }
 
   const saving = create.isPending || update.isPending
-  const inputCls = 'w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow'
+  const inputCls = 'w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600 dark:text-white focus:border-transparent transition-shadow'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="deal_contact" className="block text-sm font-medium text-gray-700 mb-1">Contact Name <span className="text-red-500">*</span></label>
+          <label htmlFor="deal_contact" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Contact Name <span className="text-red-500">*</span></label>
           <input id="deal_contact" required className={inputCls} value={form.contact_name} onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))} />
         </div>
         <div>
-          <label htmlFor="deal_company" className="block text-sm font-medium text-gray-700 mb-1">Company <span className="text-red-500">*</span></label>
+          <label htmlFor="deal_company" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Company <span className="text-red-500">*</span></label>
           <input id="deal_company" required className={inputCls} value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="deal_email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label htmlFor="deal_email" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Email</label>
           <input id="deal_email" type="email" className={inputCls} value={form.contact_email} onChange={e => setForm(f => ({ ...f, contact_email: e.target.value }))} />
         </div>
         <div>
-          <label htmlFor="deal_stage" className="block text-sm font-medium text-gray-700 mb-1">Stage</label>
+          <label htmlFor="deal_stage" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Stage</label>
           <select id="deal_stage" className={inputCls} value={form.stage} onChange={e => setForm(f => ({ ...f, stage: e.target.value as PreserviceStage }))}>
             {COLUMNS.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
           </select>
         </div>
       </div>
       <div>
-        <label htmlFor="deal_notes" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+        <label htmlFor="deal_notes" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Notes</label>
         <textarea id="deal_notes" rows={3} className={inputCls} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
       </div>
       <div>
-        <label htmlFor="deal_contact_date" className="block text-sm font-medium text-gray-700 mb-1">Last Contact Date</label>
+        <label htmlFor="deal_contact_date" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Last Contact Date</label>
         <input id="deal_contact_date" type="date" className={inputCls} value={form.last_contact_date} onChange={e => setForm(f => ({ ...f, last_contact_date: e.target.value }))} />
       </div>
       <div className="flex gap-3 pt-2">
@@ -146,7 +146,7 @@ function DealCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-white rounded-lg border border-gray-200 p-3 shadow-sm group transition-shadow hover:shadow-md ${
+      className={`bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700 p-3 shadow-sm group transition-shadow hover:shadow-md ${
         dragging || isDragging ? 'opacity-40 shadow-lg ring-2 ring-blue-400' : ''
       }`}
     >
@@ -156,7 +156,7 @@ function DealCard({
           <button
             {...attributes}
             {...listeners}
-            className="mt-0.5 p-0.5 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing touch-none flex-shrink-0"
+            className="mt-0.5 p-0.5 text-gray-300 hover:text-slate-500 dark:text-slate-400 cursor-grab active:cursor-grabbing touch-none flex-shrink-0"
             aria-label="Drag to reorder"
           >
             <GripVertical size={14} />
@@ -170,14 +170,14 @@ function DealCard({
           <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
             <button
               onClick={onEdit}
-              className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+              className="p-1 rounded hover:bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-gray-600"
               aria-label={`Edit ${deal.company}`}
             >
               <Pencil size={12} />
             </button>
             <button
               onClick={onDelete}
-              className="p-1 rounded hover:bg-red-50 text-gray-400 hover:text-red-500"
+              className="p-1 rounded hover:bg-red-50 text-slate-400 dark:text-slate-500 hover:text-red-500"
               aria-label={`Delete ${deal.company}`}
             >
               <Trash2 size={12} />
@@ -243,13 +243,13 @@ function KanbanColumn({
   return (
     <div className="flex flex-col w-72 flex-shrink-0">
       {/* Column header */}
-      <div className={`bg-white rounded-t-xl border border-b-0 border-gray-200 px-4 pt-4 pb-3 border-t-4 ${column.headerColor}`}>
+      <div className={`bg-white dark:bg-slate-900 rounded-t-xl border border-b-0 border-gray-200 dark:border-slate-700 px-4 pt-4 pb-3 border-t-4 ${column.headerColor}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${column.dotColor}`} />
             <h3 className="text-sm font-semibold text-slate-800 leading-tight">{column.label}</h3>
           </div>
-          <span className="text-xs font-semibold text-slate-400 bg-gray-100 rounded-md px-1.5 py-0.5">
+          <span className="text-xs font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-md px-1.5 py-0.5">
             {deals.length}
           </span>
         </div>
@@ -259,7 +259,7 @@ function KanbanColumn({
       {/* Drop zone */}
       <div
         ref={setNodeRef}
-        className={`flex-1 min-h-[200px] bg-gray-50 rounded-b-xl border border-t-0 border-gray-200 p-2 space-y-2 transition-colors ${
+        className={`flex-1 min-h-[200px] bg-slate-50 dark:bg-slate-800 rounded-b-xl border border-t-0 border-gray-200 dark:border-slate-700 p-2 space-y-2 transition-colors ${
           isOver ? 'bg-blue-50 border-blue-200' : ''
         }`}
       >
@@ -289,7 +289,7 @@ function KanbanColumn({
 // ─── Drag Overlay Card (non-interactive clone) ────────────────────────────────
 function DragOverlayCard({ deal }: { deal: ShmOutreach & { profiles: { full_name: string } } }) {
   return (
-    <div className="bg-white rounded-lg border border-blue-300 shadow-xl p-3 w-72 rotate-1 opacity-95">
+    <div className="bg-white dark:bg-slate-900 rounded-lg border border-blue-300 shadow-xl p-3 w-72 rotate-1 opacity-95">
       <p className="font-semibold text-slate-900 text-sm">{deal.company}</p>
       <p className="text-xs text-slate-500 mt-0.5">{deal.contact_name}</p>
       {deal.notes && <p className="text-xs text-slate-400 mt-1 line-clamp-1">{deal.notes}</p>}
@@ -395,8 +395,8 @@ export default function PipelinePage() {
         <div className="flex gap-4 overflow-x-auto pb-4">
           {COLUMNS.map(col => (
             <div key={col.id} className="w-72 flex-shrink-0 space-y-2">
-              <div className="h-16 bg-gray-200 rounded-xl animate-pulse" />
-              {[1, 2].map(i => <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />)}
+              <div className="h-16 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse" />
+              {[1, 2].map(i => <div key={i} className="h-24 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />)}
             </div>
           ))}
         </div>

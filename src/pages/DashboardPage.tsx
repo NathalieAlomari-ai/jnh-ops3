@@ -80,7 +80,7 @@ export default function DashboardPage() {
 
         {/* My Open Tasks */}
         <Card>
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
             <h2 className="font-semibold text-slate-900">My Open Tasks</h2>
             <Badge variant="gray">{myOpenCount}</Badge>
           </div>
@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
         {/* Today's Standups */}
         <Card>
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
             <h2 className="font-semibold text-slate-900">Today's Standups</h2>
             <Badge variant={standupsToday > 0 ? 'green' : 'gray'}>{standupsToday} submitted</Badge>
           </div>

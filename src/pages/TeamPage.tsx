@@ -27,7 +27,7 @@ function ProfileForm({ profile, onClose }: { profile: Profile; onClose: () => vo
     <form onSubmit={handleSubmit} className="space-y-4">
       {(['full_name', 'job_title', 'department', 'avatar_url'] as const).map(field => (
         <div key={field}>
-          <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 capitalize">
             {field.replace('_', ' ')}
           </label>
           <input
@@ -58,7 +58,7 @@ export default function TeamPage() {
       <h1 className="text-2xl font-bold text-gray-900">Team</h1>
 
       {isLoading ? (
-        <p className="text-gray-400 text-sm">Loading…</p>
+        <p className="text-slate-400 dark:text-slate-500 text-sm">Loading…</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {profiles?.map(p => (

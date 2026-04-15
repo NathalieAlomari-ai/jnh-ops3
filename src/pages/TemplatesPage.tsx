@@ -49,25 +49,25 @@ function TemplateForm({ initial, onClose }: { initial?: Partial<Template>; onClo
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="tpl_name" className="block text-sm font-medium text-gray-700 mb-1">Template Name <span className="text-red-500">*</span></label>
-        <input id="tpl_name" required className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+        <label htmlFor="tpl_name" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Template Name <span className="text-red-500">*</span></label>
+        <input id="tpl_name" required className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600 dark:text-white focus:border-transparent transition-shadow"
           value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
       </div>
       <div>
-        <label htmlFor="tpl_desc" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-        <textarea id="tpl_desc" rows={3} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+        <label htmlFor="tpl_desc" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Description</label>
+        <textarea id="tpl_desc" rows={3} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600 dark:text-white focus:border-transparent transition-shadow"
           value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
       </div>
       <div>
-        <label htmlFor="tpl_category" className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-        <input id="tpl_category" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+        <label htmlFor="tpl_category" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Category</label>
+        <input id="tpl_category" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600 dark:text-white focus:border-transparent transition-shadow"
           placeholder="e.g. shm_fleet_management, shm_agent"
           value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} />
       </div>
 
       {/* Layer toggles */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Default AI Layers</label>
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Default AI Layers</label>
         <div className="grid grid-cols-3 gap-3">
           {LAYERS.map(({ key, label, icon: Icon }) => {
             const active = form[key]
@@ -82,7 +82,7 @@ function TemplateForm({ initial, onClose }: { initial?: Partial<Template>; onClo
                 className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
                   active
                     ? 'border-blue-600 bg-blue-50 text-blue-700'
-                    : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
+                    : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500 hover:border-gray-300'
                 }`}
               >
                 <Icon size={20} />
@@ -113,7 +113,7 @@ export default function TemplatesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Templates</h1>
-          <p className="text-sm text-gray-500 mt-1">Pre-configured project blueprints with SEE/KNOW/DECIDE defaults</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Pre-configured project blueprints with SEE/KNOW/DECIDE defaults</p>
         </div>
         {isAdmin && (
           <Button onClick={() => setShowForm(true)}>
@@ -125,24 +125,24 @@ export default function TemplatesPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-2/3 mb-3" />
-              <div className="h-3 bg-gray-100 rounded w-1/2 mb-4" />
+            <div key={i} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 p-6 animate-pulse">
+              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-2/3 mb-3" />
+              <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-1/2 mb-4" />
               <div className="flex gap-2">
-                <div className="h-5 bg-gray-100 rounded-full w-10" />
-                <div className="h-5 bg-gray-100 rounded-full w-10" />
-                <div className="h-5 bg-gray-100 rounded-full w-10" />
+                <div className="h-5 bg-slate-100 dark:bg-slate-800 rounded-full w-10" />
+                <div className="h-5 bg-slate-100 dark:bg-slate-800 rounded-full w-10" />
+                <div className="h-5 bg-slate-100 dark:bg-slate-800 rounded-full w-10" />
               </div>
             </div>
           ))}
         </div>
       ) : !templates?.length ? (
-        <div className="bg-white rounded-xl border border-gray-200 py-16 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-2xl flex items-center justify-center">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 py-16 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center">
             <Package size={28} className="text-gray-400" />
           </div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-1">No templates yet</h3>
-          <p className="text-sm text-gray-500 mb-4">Create your first project template to get started</p>
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">No templates yet</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Create your first project template to get started</p>
           {isAdmin && <Button onClick={() => setShowForm(true)}><Plus size={16} /> Create Template</Button>}
         </div>
       ) : (
@@ -170,7 +170,7 @@ export default function TemplatesPage() {
                 </div>
 
                 {tpl.description && (
-                  <p className="text-sm text-gray-500 mb-3 line-clamp-2">{tpl.description}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-3 line-clamp-2">{tpl.description}</p>
                 )}
 
                 {/* Layer dots */}
@@ -181,7 +181,7 @@ export default function TemplatesPage() {
                       className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
                         tpl[key]
                           ? 'bg-blue-100 text-blue-700'
-                          : 'bg-gray-50 text-gray-400'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
                       }`}
                     >
                       <Icon size={12} />

@@ -57,27 +57,27 @@ function ProjectForm({ initial, onClose }: { initial?: Partial<Initiative>; onCl
   }
 
   const saving = create.isPending || update.isPending
-  const inputCls = 'w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow'
+  const inputCls = 'w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-800 dark:border-slate-600 dark:text-white focus:border-transparent transition-shadow'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="proj_name" className="block text-sm font-medium text-gray-700 mb-1">Project Name <span className="text-red-500">*</span></label>
+        <label htmlFor="proj_name" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Project Name <span className="text-red-500">*</span></label>
         <input id="proj_name" required className={inputCls} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
       </div>
       <div>
-        <label htmlFor="proj_desc" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <label htmlFor="proj_desc" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Description</label>
         <textarea id="proj_desc" rows={3} className={inputCls} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="proj_status" className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <label htmlFor="proj_status" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Status</label>
           <select id="proj_status" className={inputCls} value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as InitiativeStatus }))}>
             {STATUSES.map(s => <option key={s} value={s}>{statusLabel[s]}</option>)}
           </select>
         </div>
         <div>
-          <label htmlFor="proj_owner" className="block text-sm font-medium text-gray-700 mb-1">Owner</label>
+          <label htmlFor="proj_owner" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Owner</label>
           <select id="proj_owner" className={inputCls} value={form.owner_id} onChange={e => setForm(f => ({ ...f, owner_id: e.target.value }))}>
             {profiles?.map(p => <option key={p.id} value={p.id}>{p.full_name}</option>)}
           </select>
@@ -85,11 +85,11 @@ function ProjectForm({ initial, onClose }: { initial?: Partial<Initiative>; onCl
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="proj_start" className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+          <label htmlFor="proj_start" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Start Date</label>
           <input id="proj_start" type="date" className={inputCls} value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} />
         </div>
         <div>
-          <label htmlFor="proj_target" className="block text-sm font-medium text-gray-700 mb-1">Target Date</label>
+          <label htmlFor="proj_target" className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Target Date</label>
           <input id="proj_target" type="date" className={inputCls} value={form.target_date} onChange={e => setForm(f => ({ ...f, target_date: e.target.value }))} />
         </div>
       </div>
@@ -140,7 +140,7 @@ export default function InitiativesPage() {
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
               filterStatus === s
                 ? 'bg-blue-600 text-white'
-                : 'bg-white text-slate-600 border border-gray-200 hover:bg-gray-50'
+                : 'bg-white dark:bg-slate-900 text-slate-600 border border-gray-200 dark:border-slate-700 hover:bg-slate-50 dark:bg-slate-800'
             }`}
           >
             {s === 'all' ? 'All' : statusLabel[s]}
@@ -152,15 +152,15 @@ export default function InitiativesPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
-              <div className="h-3 bg-gray-100 rounded w-1/2" />
+            <div key={i} className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 p-6 animate-pulse">
+              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3 mb-3" />
+              <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-1/2" />
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 py-16 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-2xl flex items-center justify-center">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700 py-16 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center">
             <Briefcase size={28} className="text-gray-400" />
           </div>
           <h3 className="text-sm font-semibold text-slate-900 mb-1">No projects yet</h3>

@@ -37,7 +37,7 @@ export default function AdminPage() {
           <div className="divide-y divide-gray-50">
             {profiles?.map(p => (
               <div key={p.id} className="px-6 py-4 flex items-center gap-4">
-                <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold flex-shrink-0">
                   {p.full_name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">

@@ -49,7 +49,7 @@ const SECTIONS: {
   color: string
   bg: string
 }[] = [
-  { key: 'standup_digest',      label: 'Team Stand-up Digest',   icon: Users,         color: 'text-indigo-600',  bg: 'bg-indigo-50'  },
+  { key: 'standup_digest',      label: 'Team Stand-up Digest',   icon: Users,         color: 'text-blue-600',  bg: 'bg-blue-50'  },
   { key: 'task_progress',       label: 'Task Progress',          icon: CheckSquare,   color: 'text-emerald-600', bg: 'bg-emerald-50' },
   { key: 'strategy_update',     label: 'Strategy Update',        icon: TrendingUp,    color: 'text-blue-600',    bg: 'bg-blue-50'    },
   { key: 'action_items_risks',  label: 'Action Items & Risks',   icon: AlertTriangle, color: 'text-orange-600',  bg: 'bg-orange-50'  },
@@ -89,13 +89,13 @@ function SummaryCard({ summary }: { summary: AiSummary }) {
       <button
         id={`summary-card-${summary.id}`}
         onClick={() => setExpanded(v => !v)}
-        className="w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset"
+        className="w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset"
         aria-expanded={expanded}
         aria-controls={`summary-body-${summary.id}`}
       >
         <CardHeader className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
               <Sparkles size={18} className="text-white" />
             </div>
             <div className="min-w-0">
@@ -166,12 +166,12 @@ function GeneratingCard() {
   return (
     <Card className="overflow-hidden">
       <CardBody className="flex items-center gap-4 py-5">
-        <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0 animate-pulse">
-          <Sparkles size={18} className="text-indigo-500" />
+        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 animate-pulse">
+          <Sparkles size={18} className="text-blue-500" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <Loader2 size={14} className="text-indigo-500 animate-spin flex-shrink-0" />
+            <Loader2 size={14} className="text-blue-500 animate-spin flex-shrink-0" />
             <p className="text-sm font-semibold text-gray-900">Generating weekly summary…</p>
           </div>
           <p className="text-xs text-gray-400 mt-1">
@@ -179,7 +179,7 @@ function GeneratingCard() {
           </p>
           {/* Progress bar */}
           <div className="mt-3 h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-indigo-400 rounded-full animate-[pulse_1.5s_ease-in-out_infinite] w-3/4" />
+            <div className="h-full bg-blue-400 rounded-full animate-[pulse_1.5s_ease-in-out_infinite] w-3/4" />
           </div>
         </div>
       </CardBody>
@@ -190,8 +190,8 @@ function GeneratingCard() {
 function EmptyState({ onGenerate }: { onGenerate: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center mb-4">
-        <Sparkles size={28} className="text-indigo-400" />
+      <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
+        <Sparkles size={28} className="text-blue-400" />
       </div>
       <h3 className="text-base font-semibold text-gray-900 mb-1">No summaries yet</h3>
       <p className="text-sm text-gray-500 max-w-xs mb-6">
@@ -269,7 +269,7 @@ export default function WeeklySummaryPage() {
             <button
               id="week-prev-btn"
               onClick={prevWeek}
-              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               aria-label="Previous week"
             >
               <ChevronLeft size={16} />
@@ -280,7 +280,7 @@ export default function WeeklySummaryPage() {
                 {format(selectedMonday, 'MMM d')} – {format(endOfWeek(selectedMonday, { weekStartsOn: 1 }), 'MMM d, yyyy')}
               </span>
               {isCurrentOrFuture && (
-                <span className="ml-2 text-xs text-indigo-500 font-medium">Current week</span>
+                <span className="ml-2 text-xs text-blue-500 font-medium">Current week</span>
               )}
             </div>
 
@@ -288,7 +288,7 @@ export default function WeeklySummaryPage() {
               id="week-next-btn"
               onClick={nextWeek}
               disabled={isCurrentOrFuture}
-              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-900 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               aria-label="Next week"
             >
               <ChevronRight size={16} />

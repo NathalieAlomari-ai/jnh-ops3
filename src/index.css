@@ -1,4 +1,25 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── Brand Design Tokens ─────────────────────────────────────── */
+:root {
+  --color-accent:        #2563eb;   /* blue-600  — primary CTA, active nav */
+  --color-accent-hover:  #1d4ed8;   /* blue-700  — hover state            */
+  --color-accent-light:  #eff6ff;   /* blue-50   — subtle bg highlight     */
+  --color-accent-ring:   #93c5fd;   /* blue-300  — focus ring              */
+
+  --color-sidebar-bg:    #0f172a;   /* slate-900 — sidebar background      */
+  --color-sidebar-text:  #94a3b8;   /* slate-400 — inactive nav text       */
+  --color-sidebar-hover: #1e293b;   /* slate-800 — nav hover bg            */
+
+  --color-bg-page:       #f8fafc;   /* slate-50  — main content bg         */
+  --color-surface:       #ffffff;   /* white     — card/panel bg           */
+  --color-border:        #e2e8f0;   /* slate-200 — borders                 */
+
+  --color-text-primary:  #0f172a;   /* slate-900 — main headings           */
+  --color-text-secondary:#475569;   /* slate-600 — support text            */
+  --color-text-muted:    #94a3b8;   /* slate-400 — timestamps, metadata    */
+}
 
 * {
   box-sizing: border-box;
@@ -6,11 +27,29 @@
 
 body {
   margin: 0;
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', system-ui, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
 }
 
 #root {
   min-height: 100vh;
 }
+
+/* ── Global Form Focus Ring → Blue ───────────────────────────── */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent-ring);
+}
+
+/* ── Scrollbar (subtle, professional) ────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ── Text selection ──────────────────────────────────────────── */
+::selection { background: #bfdbfe; color: #1e3a5f; }
+

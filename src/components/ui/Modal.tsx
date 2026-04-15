@@ -33,7 +33,7 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
           <button
             ref={closeRef}
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             aria-label="Close dialog"
           >
             <X size={20} />

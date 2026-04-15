@@ -9,17 +9,14 @@ import TeamPage from '@/pages/TeamPage'
 import InitiativesPage from '@/pages/InitiativesPage'
 import StandupsPage from '@/pages/StandupsPage'
 import TasksPage from '@/pages/TasksPage'
-import PreservicePage from '@/pages/PreservicePage'
+import PipelinePage from '@/pages/PipelinePage'
 import TemplatesPage from '@/pages/TemplatesPage'
 import AdminPage from '@/pages/AdminPage'
 import WeeklySummaryPage from '@/pages/WeeklySummaryPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60,
-      retry: 1,
-    },
+    queries: { staleTime: 1000 * 60, retry: 1 },
   },
 })
 
@@ -38,13 +35,13 @@ export default function App() {
               }
             >
               <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/team" element={<TeamPage />} />
-              <Route path="/service" element={<InitiativesPage />} />
-              <Route path="/standups" element={<StandupsPage />} />
-              <Route path="/tasks" element={<TasksPage />} />
-              <Route path="/preservice" element={<PreservicePage />} />
-              <Route path="/templates" element={<TemplatesPage />} />
+              <Route path="/dashboard"  element={<DashboardPage />} />
+              <Route path="/standups"   element={<StandupsPage />} />
+              <Route path="/projects"   element={<InitiativesPage />} />
+              <Route path="/tasks"      element={<TasksPage />} />
+              <Route path="/pipeline"   element={<PipelinePage />} />
+              <Route path="/team"       element={<TeamPage />} />
+              <Route path="/templates"  element={<TemplatesPage />} />
               <Route
                 path="/admin"
                 element={

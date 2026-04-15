@@ -33,8 +33,8 @@ function StageStepper({ active, onSelect }: { active: PreserviceStage | 'all'; o
       <div className="flex items-center gap-1">
         <button
           onClick={() => onSelect('all')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
-            active === 'all' ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:bg-gray-100'
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+            active === 'all' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'
           }`}
         >
           All
@@ -44,9 +44,9 @@ function StageStepper({ active, onSelect }: { active: PreserviceStage | 'all'; o
             {idx > 0 && <ChevronRight size={14} className="text-gray-300 mx-1 flex-shrink-0" />}
             <button
               onClick={() => onSelect(stage)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
                 active === stage
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'text-gray-500 hover:bg-gray-100'
               }`}
             >
@@ -105,24 +105,24 @@ function PreserviceForm({ initial, onClose }: { initial?: Partial<ShmOutreach>; 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="contact_name" className="block text-sm font-medium text-gray-700 mb-1">Contact Name <span className="text-red-500">*</span></label>
-          <input id="contact_name" required className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+          <input id="contact_name" required className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
             value={form.contact_name} onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))} />
         </div>
         <div>
           <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">Company <span className="text-red-500">*</span></label>
-          <input id="company" required className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+          <input id="company" required className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
             value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="contact_email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input id="contact_email" type="email" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+          <input id="contact_email" type="email" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
             value={form.contact_email} onChange={e => setForm(f => ({ ...f, contact_email: e.target.value }))} />
         </div>
         <div>
           <label htmlFor="stage" className="block text-sm font-medium text-gray-700 mb-1">Stage</label>
-          <select id="stage" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+          <select id="stage" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
             value={form.stage} onChange={e => setForm(f => ({ ...f, stage: e.target.value as PreserviceStage }))}>
             {STAGES.map(s => <option key={s} value={s}>{STAGE_LABELS[s]}</option>)}
           </select>
@@ -130,12 +130,12 @@ function PreserviceForm({ initial, onClose }: { initial?: Partial<ShmOutreach>; 
       </div>
       <div>
         <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-        <textarea id="notes" rows={3} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+        <textarea id="notes" rows={3} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
           value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
       </div>
       <div>
         <label htmlFor="last_contact" className="block text-sm font-medium text-gray-700 mb-1">Last Contact Date</label>
-        <input id="last_contact" type="date" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+        <input id="last_contact" type="date" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
           value={form.last_contact_date} onChange={e => setForm(f => ({ ...f, last_contact_date: e.target.value }))} />
       </div>
       <div className="flex gap-3 pt-2">
@@ -223,7 +223,7 @@ export default function PreservicePage() {
                       <select
                         value={item.stage}
                         onChange={e => updateOutreach.mutate({ id: item.id, updates: { stage: e.target.value as PreserviceStage } })}
-                        className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                        className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                         aria-label={`Change stage for ${item.contact_name}`}
                       >
                         {STAGES.map(s => <option key={s} value={s}>{STAGE_LABELS[s]}</option>)}

@@ -31,7 +31,7 @@ function ProfileForm({ profile, onClose }: { profile: Profile; onClose: () => vo
             {field.replace('_', ' ')}
           </label>
           <input
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={form[field]}
             onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
             placeholder={field === 'avatar_url' ? 'https://...' : ''}
@@ -64,7 +64,7 @@ export default function TeamPage() {
           {profiles?.map(p => (
             <Card key={p.id}>
               <CardBody className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg flex-shrink-0">
                   {p.avatar_url
                     ? <img src={p.avatar_url} className="w-12 h-12 rounded-full object-cover" alt="" />
                     : p.full_name.charAt(0).toUpperCase()

@@ -13,6 +13,7 @@ export type PreserviceStage =
   | 'gap_analysis'
   | 'solution_scope'
   | 'technical_financial_offer'
+  | 'closed_won'
 export type AiSummaryType = 'weekly_standup' | 'outreach_draft'
 export type AiSummaryStatus = 'pending' | 'generating' | 'done' | 'error'
 export type AiSummaryTrigger = 'manual' | 'n8n'

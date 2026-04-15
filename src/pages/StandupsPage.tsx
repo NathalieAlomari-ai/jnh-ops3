@@ -31,18 +31,18 @@ function StandupForm({ onClose }: { onClose: () => void }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">What did you do today? *</label>
-        <textarea required rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        <textarea required rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={form.did_today} onChange={e => setForm(f => ({ ...f, did_today: e.target.value }))} />
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Blockers</label>
-        <textarea rows={2} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        <textarea rows={2} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Leave empty if none"
           value={form.blockers} onChange={e => setForm(f => ({ ...f, blockers: e.target.value }))} />
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Plan for tomorrow</label>
-        <textarea rows={2} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        <textarea rows={2} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={form.plan_tomorrow} onChange={e => setForm(f => ({ ...f, plan_tomorrow: e.target.value }))} />
       </div>
       <div className="flex gap-3 pt-2">
@@ -111,7 +111,7 @@ export default function StandupsPage() {
                 <CardBody>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-sm font-bold flex-shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-bold flex-shrink-0">
                         {update.profiles.full_name.charAt(0)}
                       </div>
                       <span className="font-medium text-gray-900 text-sm">{update.profiles.full_name}</span>

@@ -50,17 +50,17 @@ function TemplateForm({ initial, onClose }: { initial?: Partial<Template>; onClo
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="tpl_name" className="block text-sm font-medium text-gray-700 mb-1">Template Name <span className="text-red-500">*</span></label>
-        <input id="tpl_name" required className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+        <input id="tpl_name" required className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
           value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
       </div>
       <div>
         <label htmlFor="tpl_desc" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-        <textarea id="tpl_desc" rows={3} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+        <textarea id="tpl_desc" rows={3} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
           value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
       </div>
       <div>
         <label htmlFor="tpl_category" className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-        <input id="tpl_category" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+        <input id="tpl_category" className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
           placeholder="e.g. shm_fleet_management, shm_agent"
           value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} />
       </div>
@@ -79,9 +79,9 @@ function TemplateForm({ initial, onClose }: { initial?: Partial<Template>; onClo
                 aria-checked={active}
                 aria-label={`${label} layer`}
                 onClick={() => setForm(f => ({ ...f, [key]: !f[key] }))}
-                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
+                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
                   active
-                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                    ? 'border-blue-600 bg-blue-50 text-blue-700'
                     : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
                 }`}
               >
@@ -180,7 +180,7 @@ export default function TemplatesPage() {
                       key={key}
                       className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
                         tpl[key]
-                          ? 'bg-indigo-100 text-indigo-700'
+                          ? 'bg-blue-100 text-blue-700'
                           : 'bg-gray-50 text-gray-400'
                       }`}
                     >

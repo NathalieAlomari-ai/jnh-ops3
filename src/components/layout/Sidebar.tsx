@@ -7,11 +7,11 @@ import {
   SquareKanban,
   GitMerge,
   Users,
-  Package,
   ShieldCheck,
   LogOut,
   Sun,
   Moon,
+  CalendarDays,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -19,8 +19,9 @@ import { clsx } from 'clsx'
 
 // ─── Nav group config ─────────────────────────────────────────────────────────
 const WORKSPACE_ITEMS = [
-  { to: '/dashboard', label: 'Dashboard',      icon: LayoutDashboard },
-  { to: '/standups',  label: 'Daily Standups', icon: ClipboardList   },
+  { to: '/dashboard', label: 'Dashboard',        icon: LayoutDashboard },
+  { to: '/standups',  label: 'Daily Standups',   icon: ClipboardList   },
+  { to: '/meetings',  label: 'Meeting Schedule', icon: CalendarDays    },
 ]
 
 const OPERATIONS_ITEMS = [
@@ -33,8 +34,7 @@ const PIPELINE_ITEMS = [
 ]
 
 const SETTINGS_ITEMS = [
-  { to: '/team',      label: 'Team',      icon: Users   },
-  { to: '/templates', label: 'Templates', icon: Package },
+  { to: '/team',  label: 'Team',  icon: Users },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

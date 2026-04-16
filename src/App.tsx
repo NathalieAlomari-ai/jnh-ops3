@@ -11,7 +11,7 @@ import InitiativesPage from '@/pages/InitiativesPage'
 import StandupsPage from '@/pages/StandupsPage'
 import TasksPage from '@/pages/TasksPage'
 import PipelinePage from '@/pages/PipelinePage'
-import TemplatesPage from '@/pages/TemplatesPage'
+import MeetingsPage from '@/pages/MeetingsPage'
 import AdminPage from '@/pages/AdminPage'
 import WeeklySummaryPage from '@/pages/WeeklySummaryPage'
 
@@ -42,8 +42,8 @@ export default function App() {
               <Route path="/projects"   element={<InitiativesPage />} />
               <Route path="/tasks"      element={<TasksPage />} />
               <Route path="/pipeline"   element={<PipelinePage />} />
+              <Route path="/meetings"   element={<MeetingsPage />} />
               <Route path="/team"       element={<TeamPage />} />
-              <Route path="/templates"  element={<TemplatesPage />} />
               <Route
                 path="/admin"
                 element={

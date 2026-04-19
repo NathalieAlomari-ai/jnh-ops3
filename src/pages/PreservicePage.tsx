@@ -10,7 +10,7 @@ import { Modal } from '@/components/ui/Modal'
 import type { ShmOutreach, PreserviceStage } from '@/types/database'
 
 const STAGES: PreserviceStage[] = [
-  'as_is_study', 'gap_analysis', 'solution_scope', 'technical_financial_offer',
+  'as_is_study', 'gap_analysis', 'solution_scope', 'technical_financial_offer', 'closed_won',
 ]
 
 const STAGE_LABELS: Record<PreserviceStage, string> = {
@@ -18,6 +18,7 @@ const STAGE_LABELS: Record<PreserviceStage, string> = {
   gap_analysis: 'Gap Analysis',
   solution_scope: 'Solution Scope',
   technical_financial_offer: 'Technical & Financial Offer',
+  closed_won: 'Closed Won',
 }
 
 const stageColors: Record<PreserviceStage, 'gray' | 'blue' | 'yellow' | 'green'> = {
@@ -25,6 +26,7 @@ const stageColors: Record<PreserviceStage, 'gray' | 'blue' | 'yellow' | 'green'>
   gap_analysis: 'blue',
   solution_scope: 'yellow',
   technical_financial_offer: 'green',
+  closed_won: 'green',
 }
 
 function StageStepper({ active, onSelect }: { active: PreserviceStage | 'all'; onSelect: (s: PreserviceStage | 'all') => void }) {

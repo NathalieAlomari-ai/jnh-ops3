@@ -10,6 +10,7 @@ interface AuthContextValue {
   loading: boolean
   isAdmin: boolean
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
+  signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
 }
 
@@ -61,6 +62,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error }
   }
 
+  async function signInWithMagicLink(email: string) {
+    const { error } = await supabase.auth.signInWithOtp({ 
+      email,
+      options: {
+        emailRedirectTo: window.location.origin
+      }
+    })
+    return { error }
+  }
+
   async function signOut() {
     await supabase.auth.signOut()
   }
@@ -73,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       isAdmin: profile?.role === 'admin',
       signIn,
+      signInWithMagicLink,
       signOut,
     }}>
       {children}

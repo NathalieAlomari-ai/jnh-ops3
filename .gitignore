@@ -22,6 +22,9 @@ supabase/.branches
 supabase/.temp
 supabase/config.toml   # if you have one with local secrets
 
+# Claude Code
+.claude/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

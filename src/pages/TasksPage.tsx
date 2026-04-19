@@ -23,6 +23,22 @@ const priorityColors: Record<TaskPriority, 'gray' | 'yellow' | 'orange' | 'red'>
   low: 'gray', medium: 'yellow', high: 'orange', urgent: 'red',
 }
 
+const AVATAR_COLORS = [
+  'bg-blue-600', 'bg-emerald-600', 'bg-violet-600',
+  'bg-orange-500', 'bg-rose-600', 'bg-teal-600', 'bg-amber-600',
+]
+
+function AssigneeAvatar({ name, index }: { name: string; index: number }) {
+  const color = AVATAR_COLORS[index % AVATAR_COLORS.length]
+  return (
+    <div className={`w-7 h-7 rounded-full ${color} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}
+         title={name}>
+      {name.charAt(0).toUpperCase()}
+    </div>
+  )
+}
+
+// ─── Task Form ─────────────────────────────────────────────────────────────────
 function TaskForm({ initial, onClose }: { initial?: Partial<ShmTask>; onClose: () => void }) {
   const { profile } = useAuth()
   const { data: profiles } = useProfiles()
@@ -31,22 +47,22 @@ function TaskForm({ initial, onClose }: { initial?: Partial<ShmTask>; onClose: (
   const update = useUpdateShmTask()
 
   const [form, setForm] = useState({
-    title: initial?.title ?? '',
-    description: initial?.description ?? '',
-    status: (initial?.status ?? 'todo') as TaskStatus,
-    priority: (initial?.priority ?? 'medium') as TaskPriority,
-    assignee_id: initial?.assignee_id ?? profile?.id ?? '',
+    title:        initial?.title ?? '',
+    description:  initial?.description ?? '',
+    status:       (initial?.status      ?? 'todo')   as TaskStatus,
+    priority:     (initial?.priority    ?? 'medium') as TaskPriority,
+    assignee_id:  initial?.assignee_id  ?? profile?.id ?? '',
     initiative_id: initial?.initiative_id ?? '',
-    due_date: initial?.due_date ?? '',
+    due_date:     initial?.due_date ?? '',
   })
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const payload = {
       ...form,
-      description: form.description || null,
+      description:   form.description   || null,
       initiative_id: form.initiative_id || null,
-      due_date: form.due_date || null,
+      due_date:      form.due_date      || null,
     }
     if (initial?.id) {
       await update.mutateAsync({ id: initial.id, updates: payload })
@@ -57,30 +73,32 @@ function TaskForm({ initial, onClose }: { initial?: Partial<ShmTask>; onClose: (
   }
 
   const saving = create.isPending || update.isPending
+  const inputCls = 'w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500'
+  const labelCls = 'block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Title *</label>
-        <input required className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <label className={labelCls}>Title *</label>
+        <input required className={inputCls}
           value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
       </div>
       <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Description</label>
-        <textarea rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <label className={labelCls}>Description</label>
+        <textarea rows={3} className={inputCls}
           value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Status</label>
-          <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <label className={labelCls}>Status</label>
+          <select className={inputCls}
             value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as TaskStatus }))}>
             {STATUSES.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Priority</label>
-          <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <label className={labelCls}>Priority</label>
+          <select className={inputCls}
             value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value as TaskPriority }))}>
             {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
           </select>
@@ -88,21 +106,21 @@ function TaskForm({ initial, onClose }: { initial?: Partial<ShmTask>; onClose: (
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Assignee</label>
-          <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <label className={labelCls}>Assignee</label>
+          <select className={inputCls}
             value={form.assignee_id} onChange={e => setForm(f => ({ ...f, assignee_id: e.target.value }))}>
             {profiles?.map(p => <option key={p.id} value={p.id}>{p.full_name}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Due Date</label>
-          <input type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <label className={labelCls}>Due Date</label>
+          <input type="date" className={inputCls}
             value={form.due_date} onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))} />
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Initiative</label>
-        <select className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        <label className={labelCls}>Initiative</label>
+        <select className={inputCls}
           value={form.initiative_id} onChange={e => setForm(f => ({ ...f, initiative_id: e.target.value }))}>
           <option value="">— None —</option>
           {initiatives?.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
@@ -116,67 +134,148 @@ function TaskForm({ initial, onClose }: { initial?: Partial<ShmTask>; onClose: (
   )
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function TasksPage() {
   const { data: tasks, isLoading } = useShmTasks()
+  const { data: profiles } = useProfiles()
   const { isAdmin, profile } = useAuth()
   const deleteTask = useDeleteShmTask()
   const updateTask = useUpdateShmTask()
-  const [showForm, setShowForm] = useState(false)
-  const [editing, setEditing] = useState<ShmTask | null>(null)
+  const [showForm, setShowForm]   = useState(false)
+  const [editing, setEditing]     = useState<ShmTask | null>(null)
   const [filterStatus, setFilterStatus] = useState<TaskStatus | 'all'>('all')
+  const [filterAssignee, setFilterAssignee] = useState<string>('all')
 
   useRealtimeSubscription('shm_tasks', ['shm_tasks'])
 
-  const filtered = tasks?.filter(t =>
-    filterStatus === 'all' ? true : t.status === filterStatus
-  ) ?? []
+  // Build a stable color index for assignees
+  const profileColorIndex = new Map(profiles?.map((p, i) => [p.id, i]) ?? [])
+
+  const filtered = (tasks ?? []).filter(t => {
+    const statusOk   = filterStatus   === 'all' || t.status      === filterStatus
+    const assigneeOk = filterAssignee === 'all' || t.assignee_id === filterAssignee
+    return statusOk && assigneeOk
+  })
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">SHM Tasks</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Task Board</h1>
+          {isAdmin && (
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              All team · {(tasks ?? []).filter(t => t.status !== 'done' && t.status !== 'cancelled').length} open tasks
+            </p>
+          )}
+        </div>
         <Button onClick={() => setShowForm(true)}><Plus size={16} /> New Task</Button>
       </div>
 
-      {/* Status filter */}
-      <div className="flex gap-2 flex-wrap">
-        {(['all', ...STATUSES] as const).map(s => (
-          <button key={s}
-            onClick={() => setFilterStatus(s)}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-              filterStatus === s ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {s.replace('_', ' ')}
-          </button>
-        ))}
+      {/* Filters */}
+      <div className="space-y-2">
+        {/* Status filter */}
+        <div className="flex gap-2 flex-wrap items-center">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Status:</span>
+          {(['all', ...STATUSES] as const).map(s => (
+            <button key={s}
+              onClick={() => setFilterStatus(s)}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                filterStatus === s
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              {s.replace(/_/g, ' ')}
+            </button>
+          ))}
+        </div>
+
+        {/* Assignee filter — admin only */}
+        {isAdmin && profiles && profiles.length > 0 && (
+          <div className="flex gap-2 flex-wrap items-center">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Assignee:</span>
+            <button
+              onClick={() => setFilterAssignee('all')}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                filterAssignee === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-200'
+              }`}
+            >
+              Everyone
+            </button>
+            {profiles.map((p, i) => (
+              <button
+                key={p.id}
+                onClick={() => setFilterAssignee(p.id)}
+                className={`flex items-center gap-1.5 pl-1.5 pr-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                  filterAssignee === p.id
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-200'
+                }`}
+              >
+                <div className={`w-4 h-4 rounded-full ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center text-white text-[9px] font-bold`}>
+                  {p.full_name.charAt(0)}
+                </div>
+                {p.full_name.split(' ')[0]}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {isLoading ? <p className="text-slate-400 dark:text-slate-500 text-sm">Loading…</p> : (
+      {isLoading ? (
+        <p className="text-slate-400 dark:text-slate-500 text-sm">Loading…</p>
+      ) : (
         <div className="space-y-2">
           {filtered.map(task => (
             <Card key={task.id}>
               <CardBody className="flex items-start gap-4">
+                {/* Assignee avatar — prominent for admin */}
+                {isAdmin && (
+                  <div className="flex-shrink-0 pt-0.5">
+                    <AssigneeAvatar
+                      name={task.profiles.full_name}
+                      index={profileColorIndex.get(task.assignee_id) ?? 0}
+                    />
+                  </div>
+                )}
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-medium text-gray-900">{task.title}</h3>
-                    <Badge variant={statusColors[task.status]}>{task.status.replace('_', ' ')}</Badge>
+                    <h3 className="font-medium text-gray-900 dark:text-white">{task.title}</h3>
+                    <Badge variant={statusColors[task.status]}>{task.status.replace(/_/g, ' ')}</Badge>
                     <Badge variant={priorityColors[task.priority]}>{task.priority}</Badge>
                   </div>
-                  {task.description && <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{task.description}</p>}
-                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
-                    <span>{task.profiles.full_name}</span>
-                    {task.due_date && <span>Due: {format(new Date(task.due_date + 'T12:00:00'), 'MMM d')}</span>}
+                  {task.description && (
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{task.description}</p>
+                  )}
+                  <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                    {/* Always show the assignee name with avatar for admin */}
+                    <span className="flex items-center gap-1.5">
+                      {!isAdmin && (
+                        <div className={`w-4 h-4 rounded-full ${AVATAR_COLORS[(profileColorIndex.get(task.assignee_id) ?? 0) % AVATAR_COLORS.length]} flex items-center justify-center text-white text-[9px] font-bold`}>
+                          {task.profiles.full_name.charAt(0)}
+                        </div>
+                      )}
+                      <span className={isAdmin ? 'font-medium text-slate-600 dark:text-slate-300' : ''}>
+                        {task.profiles.full_name}
+                      </span>
+                    </span>
+                    {task.due_date && (
+                      <span>Due: {format(new Date(task.due_date + 'T12:00:00'), 'MMM d')}</span>
+                    )}
                   </div>
                 </div>
+
                 {(isAdmin || task.assignee_id === profile?.id) && (
                   <div className="flex gap-1 flex-shrink-0">
                     <select
                       value={task.status}
                       onChange={e => updateTask.mutate({ id: task.id, updates: { status: e.target.value as TaskStatus } })}
-                      className="text-xs border border-gray-200 dark:border-slate-700 rounded-md px-2 py-1 focus:outline-none"
+                      className="text-xs border border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded-md px-2 py-1 focus:outline-none"
                     >
-                      {STATUSES.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
+                      {STATUSES.map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
                     </select>
                     <Button size="sm" variant="ghost" onClick={() => setEditing(task)}>
                       <Pencil size={14} />
@@ -193,7 +292,9 @@ export default function TasksPage() {
               </CardBody>
             </Card>
           ))}
-          {!filtered.length && <p className="text-center text-slate-400 dark:text-slate-500 py-12 text-sm">No tasks found</p>}
+          {!filtered.length && (
+            <p className="text-center text-slate-400 dark:text-slate-500 py-12 text-sm">No tasks found</p>
+          )}
         </div>
       )}
 

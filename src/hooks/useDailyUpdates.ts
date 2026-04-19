@@ -2,9 +2,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import type { DailyUpdate, DailyUpdateWithProfile } from '@/types/database'
 
-export function useDailyUpdates(dateFrom?: string) {
+export function useDailyUpdates(dateFrom?: string, dateTo?: string) {
   return useQuery({
-    queryKey: ['daily_updates', dateFrom],
+    queryKey: ['daily_updates', dateFrom, dateTo],
     queryFn: async () => {
       let query = supabase
         .from('daily_updates')
@@ -12,6 +12,7 @@ export function useDailyUpdates(dateFrom?: string) {
         .order('update_date', { ascending: false })
         .order('created_at', { ascending: false })
       if (dateFrom) query = query.gte('update_date', dateFrom)
+      if (dateTo)   query = query.lte('update_date', dateTo)
       const { data, error } = await query
       if (error) throw error
       return data as DailyUpdateWithProfile[]

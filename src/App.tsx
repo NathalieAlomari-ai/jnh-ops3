@@ -37,13 +37,14 @@ export default function App() {
               }
             >
               <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard"  element={<DashboardPage />} />
-              <Route path="/standups"   element={<StandupsPage />} />
-              <Route path="/projects"   element={<InitiativesPage />} />
-              <Route path="/tasks"      element={<TasksPage />} />
-              <Route path="/pipeline"   element={<PipelinePage />} />
-              <Route path="/meetings"   element={<MeetingsPage />} />
-              <Route path="/team"       element={<TeamPage />} />
+              <Route path="/dashboard"       element={<DashboardPage />} />
+              <Route path="/standups"        element={<StandupsPage />} />
+              <Route path="/projects"        element={<InitiativesPage />} />
+              <Route path="/tasks"           element={<TasksPage />} />
+              <Route path="/pipeline"        element={<PipelinePage />} />
+              <Route path="/meetings"        element={<MeetingsPage />} />
+              <Route path="/weekly-summary"  element={<WeeklySummaryPage />} />
+              <Route path="/team"            element={<TeamPage />} />
               <Route
                 path="/admin"
                 element={
@@ -54,11 +55,7 @@ export default function App() {
               />
               <Route
                 path="/admin/weekly-summary"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <WeeklySummaryPage />
-                  </ProtectedRoute>
-                }
+                element={<Navigate to="/weekly-summary" replace />}
               />
             </Route>
             <Route path="*" element={<Navigate to="/dashboard" replace />} />

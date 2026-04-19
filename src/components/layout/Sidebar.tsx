@@ -19,9 +19,10 @@ import { clsx } from 'clsx'
 
 // ─── Nav group config ─────────────────────────────────────────────────────────
 const WORKSPACE_ITEMS = [
-  { to: '/dashboard', label: 'Dashboard',        icon: LayoutDashboard },
-  { to: '/standups',  label: 'Daily Standups',   icon: ClipboardList   },
-  { to: '/meetings',  label: 'Meeting Schedule', icon: CalendarDays    },
+  { to: '/dashboard',        label: 'Dashboard',        icon: LayoutDashboard },
+  { to: '/standups',         label: 'Daily Standups',   icon: ClipboardList   },
+  { to: '/meetings',         label: 'Meeting Schedule', icon: CalendarDays    },
+  { to: '/weekly-summary',   label: 'Weekly Summary',   icon: FileText        },
 ]
 
 const OPERATIONS_ITEMS = [
@@ -82,12 +83,6 @@ export default function Sidebar() {
               {label}
             </NavLink>
           ))}
-          {isAdmin && (
-            <NavLink to="/admin/weekly-summary" className={linkClass}>
-              <FileText size={16} strokeWidth={2} />
-              Weekly Summary
-            </NavLink>
-          )}
         </NavGroup>
 
         <NavGroup label="Operations">

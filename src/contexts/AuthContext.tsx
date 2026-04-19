@@ -22,63 +22,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    setProfile(data ?? null)
+  async function fetchProfile(userId: string, mounted: { current: boolean }) {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      if (mounted.current) setProfile(data ?? null)
+    } catch {
+      if (mounted.current) setProfile(null)
+    }
   }
 
   useEffect(() => {
-    let mounted = true;
+    const mounted = { current: true }
 
-    async function initialize() {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession()
-        if (error) throw error
+    // Fallback: if Supabase never fires, unblock after 5s
+    const timeout = setTimeout(() => {
+      if (mounted.current) setLoading(false)
+    }, 5000)
 
-        if (mounted) {
-          setSession(session)
-          setUser(session?.user ?? null)
-        }
-
-        if (session?.user) {
-          await fetchProfile(session.user.id)
-        }
-      } catch (err) {
-        console.error('Error getting session:', err)
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    initialize()
-
+    // onAuthStateChange always fires INITIAL_SESSION immediately with the
+    // current session from localStorage — no network call needed.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        if (!mounted) return
-        
-        try {
-          setSession(newSession)
-          setUser(newSession?.user ?? null)
+      (_event, newSession) => {
+        if (!mounted.current) return
 
-          if (newSession?.user) {
-            await fetchProfile(newSession.user.id)
-          } else {
-            setProfile(null)
-          }
-        } catch (err) {
-          console.error('Error on auth state change:', err)
-        } finally {
-          if (mounted) setLoading(false)
+        clearTimeout(timeout)
+        setSession(newSession)
+        setUser(newSession?.user ?? null)
+        setLoading(false)
+
+        if (newSession?.user) {
+          fetchProfile(newSession.user.id, mounted)
+        } else {
+          setProfile(null)
         }
       }
     )
 
     return () => {
-      mounted = false;
+      mounted.current = false
+      clearTimeout(timeout)
       subscription.unsubscribe()
     }
   }, [])

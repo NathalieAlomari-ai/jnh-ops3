@@ -32,47 +32,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    const initializeAuth = async () => {
+    let mounted = true;
+
+    async function initialize() {
       try {
         const { data: { session }, error } = await supabase.auth.getSession()
-        if (error) {
-          console.error("Error getting session:", error)
+        if (error) throw error
+
+        if (mounted) {
+          setSession(session)
+          setUser(session?.user ?? null)
         }
-        setSession(session)
-        setUser(session?.user ?? null)
 
         if (session?.user) {
           await fetchProfile(session.user.id)
         }
       } catch (err) {
-        console.error("Error during auth init:", err)
+        console.error('Error getting session:', err)
       } finally {
-        setLoading(false)
+        if (mounted) setLoading(false)
       }
     }
 
-    initializeAuth()
+    initialize()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (_event, newSession) => {
+        if (!mounted) return
+        
         try {
-          setSession(session)
-          setUser(session?.user ?? null)
+          setSession(newSession)
+          setUser(newSession?.user ?? null)
 
-          if (session?.user) {
-            await fetchProfile(session.user.id)
+          if (newSession?.user) {
+            await fetchProfile(newSession.user.id)
           } else {
             setProfile(null)
           }
         } catch (err) {
-          console.error("Error during auth state change:", err)
+          console.error('Error on auth state change:', err)
         } finally {
-          setLoading(false)
+          if (mounted) setLoading(false)
         }
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false;
+      subscription.unsubscribe()
+    }
   }, [])
 
   async function signIn(email: string, password: string) {

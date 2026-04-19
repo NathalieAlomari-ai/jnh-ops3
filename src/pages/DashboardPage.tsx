@@ -145,7 +145,7 @@ function AdminDashboard() {
               </div>
             ) : (
               <ul className="divide-y divide-gray-50 dark:divide-slate-800">
-                {todayUpdates.map((update, i) => (
+                {todayUpdates.map((update) => (
                   <li key={update.id} className="px-6 py-3">
                     <div className="flex items-center gap-2 mb-1">
                       <Avatar name={update.profiles.full_name} index={profileIndex.get(update.user_id)} />

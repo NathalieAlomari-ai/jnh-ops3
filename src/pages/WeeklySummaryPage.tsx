@@ -25,7 +25,7 @@ import { useWeeklySummaries, useGenerateWeeklySummary } from '@/hooks/useAiFeatu
 import { useDailyUpdates } from '@/hooks/useDailyUpdates'
 import { useProfiles } from '@/hooks/useProfiles'
 import { useAuth } from '@/hooks/useAuth'
-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
+import { Card, CardBody } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import type { WeeklySummaryReport } from '@/types/database'

@@ -18,13 +18,6 @@ import { Modal } from '@/components/ui/Modal'
 import { Badge } from '@/components/ui/Badge'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function formatMeetingDate(date: string): string {
-  const d = parseISO(date)
-  if (isToday(d))    return 'Today'
-  if (isTomorrow(d)) return 'Tomorrow'
-  return format(d, 'EEEE, MMM d')
-}
-
 function dateLabel(date: string): { label: string; variant: 'green' | 'blue' | 'gray' } {
   const d = parseISO(date)
   if (isToday(d))         return { label: 'Today',    variant: 'green' }

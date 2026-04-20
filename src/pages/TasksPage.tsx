@@ -10,6 +10,7 @@ import { Card, CardBody } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
+import { triggerWebhook } from '@/lib/webhook'
 import type { ShmTask, TaskStatus, TaskPriority } from '@/types/database'
 
 const STATUSES: TaskStatus[] = ['todo', 'in_progress', 'in_review', 'done', 'cancelled']
@@ -68,6 +69,21 @@ function TaskForm({ initial, onClose }: { initial?: Partial<ShmTask>; onClose: (
       await update.mutateAsync({ id: initial.id, updates: payload })
     } else {
       await create.mutateAsync(payload as Omit<ShmTask, 'id' | 'created_at' | 'updated_at'>)
+      // n8n webhook — notify about task assignment
+      const assignee = profiles?.find(p => p.id === form.assignee_id)
+      if (assignee) {
+        triggerWebhook({
+          event: 'task.assigned',
+          task: {
+            title:        payload.title,
+            description:  payload.description,
+            status:       payload.status,
+            priority:     payload.priority,
+            due_date:     payload.due_date,
+          },
+          assignee: { id: assignee.id, name: assignee.full_name },
+        })
+      }
     }
     onClose()
   }

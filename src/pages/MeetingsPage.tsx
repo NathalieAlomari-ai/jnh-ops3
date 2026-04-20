@@ -1,133 +1,278 @@
 import { useState, useMemo } from 'react'
 import { format, isToday, isTomorrow, isPast, parseISO } from 'date-fns'
 import {
-  CalendarDays,
-  Plus,
-  Clock,
-  User,
-  Trash2,
-  CalendarCheck,
-  CalendarClock,
-  StickyNote,
+  CalendarDays, Plus, Clock, Users, Trash2,
+  CalendarCheck, CalendarClock, StickyNote, Check,
 } from 'lucide-react'
 import { useMeetings } from '@/hooks/useMeetings'
+import type { Meeting } from '@/hooks/useMeetings'
 import { useProfiles } from '@/hooks/useProfiles'
 import { Card, CardBody } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { Badge } from '@/components/ui/Badge'
+import { triggerWebhook } from '@/lib/webhook'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function dateLabel(date: string): { label: string; variant: 'green' | 'blue' | 'gray' } {
   const d = parseISO(date)
-  if (isToday(d))         return { label: 'Today',    variant: 'green' }
-  if (isTomorrow(d))      return { label: 'Tomorrow', variant: 'blue'  }
-  if (isPast(parseISO(`${date}T23:59`))) return { label: 'Past', variant: 'gray' }
+  if (isToday(d))                          return { label: 'Today',    variant: 'green' }
+  if (isTomorrow(d))                       return { label: 'Tomorrow', variant: 'blue'  }
+  if (isPast(parseISO(`${date}T23:59`)))   return { label: 'Past',     variant: 'gray'  }
   return { label: format(d, 'MMM d'), variant: 'blue' }
 }
 
-// ─── Schedule Form ─────────────────────────────────────────────────────────────
+const AVATAR_COLORS = ['#007bff','#0cc0df','#7c3aed','#059669','#db2777','#d97706']
+function avatarColor(i: number) { return AVATAR_COLORS[i % AVATAR_COLORS.length] }
+
+// ─── Multi-Attendee Picker ────────────────────────────────────────────────────
+function AttendeePicker({
+  profiles,
+  selected,
+  onChange,
+}: {
+  profiles: { id: string; full_name: string }[]
+  selected: Set<string>
+  onChange: (next: Set<string>) => void
+}) {
+  const allSelected = profiles.length > 0 && selected.size === profiles.length
+
+  function toggleAll() {
+    if (allSelected) {
+      onChange(new Set())
+    } else {
+      onChange(new Set(profiles.map(p => p.id)))
+    }
+  }
+
+  function toggle(id: string) {
+    const next = new Set(selected)
+    if (next.has(id)) next.delete(id)
+    else               next.add(id)
+    onChange(next)
+  }
+
+  return (
+    <div
+      className="rounded-xl overflow-hidden"
+      style={{ border: '1.5px solid var(--border)' }}
+    >
+      {/* Select All row */}
+      <button
+        type="button"
+        onClick={toggleAll}
+        className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors"
+        style={{
+          background: allSelected ? 'rgba(0,123,255,0.06)' : 'var(--surface-2)',
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
+        {/* Checkbox */}
+        <span
+          className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0"
+          style={{
+            background: allSelected ? '#007bff' : 'transparent',
+            border: `2px solid ${allSelected ? '#007bff' : 'var(--border-strong)'}`,
+          }}
+        >
+          {allSelected && <Check size={10} className="text-white" strokeWidth={3} />}
+        </span>
+        <span className="text-[13px] font-semibold" style={{ color: 'var(--t1)' }}>
+          Select All Members
+        </span>
+        {selected.size > 0 && (
+          <span
+            className="ml-auto text-[11px] font-semibold px-2 py-0.5 rounded-full"
+            style={{ background: 'rgba(0,123,255,0.12)', color: '#007bff' }}
+          >
+            {selected.size} selected
+          </span>
+        )}
+      </button>
+
+      {/* Individual members */}
+      <div className="max-h-48 overflow-y-auto" style={{ background: 'var(--surface)' }}>
+        {profiles.map((p, i) => {
+          const checked = selected.has(p.id)
+          return (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => toggle(p.id)}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors"
+              style={{
+                background: checked ? 'rgba(0,123,255,0.05)' : 'transparent',
+                borderTop: i === 0 ? 'none' : '1px solid var(--border)',
+              }}
+              onMouseEnter={e => !checked && ((e.currentTarget as HTMLElement).style.background = 'var(--surface-2)')}
+              onMouseLeave={e => !checked && ((e.currentTarget as HTMLElement).style.background = 'transparent')}
+            >
+              {/* Checkbox */}
+              <span
+                className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition-all"
+                style={{
+                  background: checked ? '#007bff' : 'transparent',
+                  border: `2px solid ${checked ? '#007bff' : 'var(--border-strong)'}`,
+                }}
+              >
+                {checked && <Check size={10} className="text-white" strokeWidth={3} />}
+              </span>
+
+              {/* Avatar */}
+              <div
+                className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold"
+                style={{ background: avatarColor(i) }}
+              >
+                {p.full_name.charAt(0).toUpperCase()}
+              </div>
+
+              <span
+                className="text-[13px] font-medium truncate"
+                style={{ color: checked ? 'var(--t1)' : 'var(--t2)' }}
+              >
+                {p.full_name}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ─── Schedule Form ────────────────────────────────────────────────────────────
 function ScheduleForm({ onClose }: { onClose: () => void }) {
-  const { data: profiles } = useProfiles()
+  const { data: profiles = [] } = useProfiles()
   const { addMeeting } = useMeetings()
 
   const todayStr = format(new Date(), 'yyyy-MM-dd')
   const nowTime  = format(new Date(), 'HH:mm')
 
-  const [form, setForm] = useState({
-    title:       '',
-    date:        todayStr,
-    time:        nowTime,
-    attendee_id: '',
-    notes:       '',
-  })
-  const [saving, setSaving] = useState(false)
+  const [title, setTitle]           = useState('')
+  const [date, setDate]             = useState(todayStr)
+  const [time, setTime]             = useState(nowTime)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [notes, setNotes]           = useState('')
+  const [saving, setSaving]         = useState(false)
 
-  const selectedProfile = profiles?.find(p => p.id === form.attendee_id)
+  const inputCls = [
+    'w-full px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all',
+    'border-[1.5px]',
+  ].join(' ')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.attendee_id) return
+    if (selectedIds.size === 0) return
+
+    const attendees = profiles
+      .filter(p => selectedIds.has(p.id))
+      .map(p => ({ id: p.id, name: p.full_name }))
+
+    const autoTitle = title.trim() ||
+      (attendees.length === 1
+        ? `Meeting with ${attendees[0].name}`
+        : `Team meeting — ${attendees.map(a => a.name.split(' ')[0]).join(', ')}`)
+
     setSaving(true)
-    addMeeting({
-      title:         form.title || `Meeting with ${selectedProfile?.full_name ?? 'Team Member'}`,
-      date:          form.date,
-      time:          form.time,
-      attendee_id:   form.attendee_id,
-      attendee_name: selectedProfile?.full_name ?? '',
-      notes:         form.notes,
+    const meeting = addMeeting({ title: autoTitle, date, time, attendees, notes })
+
+    // n8n webhook — fire and forget
+    triggerWebhook({
+      event: 'meeting.scheduled',
+      meeting: {
+        id:         meeting.id,
+        title:      meeting.title,
+        date:       meeting.date,
+        time:       meeting.time,
+        notes:      meeting.notes,
+        created_at: meeting.created_at,
+      },
+      attendees,
     })
+
     setSaving(false)
     onClose()
   }
 
-  const inputCls = 'w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500'
-  const labelCls = 'block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1'
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Title */}
       <div>
-        <label className={labelCls}>Meeting Title</label>
+        <label className="block text-[12px] font-semibold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
+          Meeting Title
+        </label>
         <input
           className={inputCls}
           placeholder="e.g. Weekly 1-on-1"
-          value={form.title}
-          onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--t1)' }}
         />
       </div>
 
+      {/* Attendees */}
       <div>
-        <label className={labelCls}>Team Member <span className="text-red-500">*</span></label>
-        <select
-          required
-          className={inputCls}
-          value={form.attendee_id}
-          onChange={e => setForm(f => ({ ...f, attendee_id: e.target.value }))}
-        >
-          <option value="">— Select a team member —</option>
-          {profiles?.map(p => (
-            <option key={p.id} value={p.id}>{p.full_name}</option>
-          ))}
-        </select>
+        <label className="block text-[12px] font-semibold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
+          Attendees <span className="text-red-500 normal-case tracking-normal">*</span>
+        </label>
+        <AttendeePicker
+          profiles={profiles}
+          selected={selectedIds}
+          onChange={setSelectedIds}
+        />
+        {selectedIds.size === 0 && (
+          <p className="text-[11px] mt-1.5" style={{ color: 'var(--t3)' }}>Select at least one team member.</p>
+        )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* Date + Time */}
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className={labelCls}>Date <span className="text-red-500">*</span></label>
+          <label className="block text-[12px] font-semibold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
+            Date <span className="text-red-500">*</span>
+          </label>
           <input
             required
             type="date"
             className={inputCls}
-            value={form.date}
-            onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
+            value={date}
+            onChange={e => setDate(e.target.value)}
+            style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--t1)' }}
           />
         </div>
         <div>
-          <label className={labelCls}>Time <span className="text-red-500">*</span></label>
+          <label className="block text-[12px] font-semibold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
+            Time <span className="text-red-500">*</span>
+          </label>
           <input
             required
             type="time"
             className={inputCls}
-            value={form.time}
-            onChange={e => setForm(f => ({ ...f, time: e.target.value }))}
+            value={time}
+            onChange={e => setTime(e.target.value)}
+            style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--t1)' }}
           />
         </div>
       </div>
 
+      {/* Notes */}
       <div>
-        <label className={labelCls}>Notes</label>
+        <label className="block text-[12px] font-semibold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
+          Notes
+        </label>
         <textarea
           rows={3}
           className={inputCls}
-          placeholder="Agenda items, discussion points…"
-          value={form.notes}
-          onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+          placeholder="Agenda, discussion points…"
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
+          style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--t1)', resize: 'none' }}
         />
       </div>
 
-      <div className="flex gap-3 pt-2">
-        <Button type="submit" disabled={saving || !form.attendee_id}>
-          {saving ? 'Saving…' : 'Schedule Meeting'}
+      <div className="flex gap-3 pt-1">
+        <Button type="submit" disabled={saving || selectedIds.size === 0}>
+          {saving ? 'Scheduling…' : 'Schedule Meeting'}
         </Button>
         <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
       </div>
@@ -135,54 +280,74 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
   )
 }
 
-// ─── Meeting Card ──────────────────────────────────────────────────────────────
-function MeetingCard({ meeting, onDelete }: {
-  meeting: import('@/hooks/useMeetings').Meeting
-  onDelete: () => void
-}) {
+// ─── Meeting Card ─────────────────────────────────────────────────────────────
+function MeetingCard({ meeting, onDelete }: { meeting: Meeting; onDelete: () => void }) {
   const { label, variant } = dateLabel(meeting.date)
   const isPastMeeting = isPast(parseISO(`${meeting.date}T${meeting.time}`))
 
   return (
-    <Card className={isPastMeeting ? 'opacity-60' : ''}>
+    <Card className={isPastMeeting ? 'opacity-55' : ''}>
       <CardBody className="flex items-start gap-4 py-4">
-        {/* Date block */}
-        <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex flex-col items-center justify-center flex-shrink-0 border border-blue-100 dark:border-blue-800">
-          <span className="text-[10px] font-semibold text-blue-500 uppercase tracking-wide leading-none">
+
+        {/* Date badge */}
+        <div
+          className="w-12 h-12 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
+          style={{ background: 'rgba(0,123,255,0.08)', border: '1.5px solid rgba(0,123,255,0.16)' }}
+        >
+          <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: '#007bff' }}>
             {format(parseISO(meeting.date), 'MMM')}
           </span>
-          <span className="text-lg font-bold text-blue-600 dark:text-blue-400 leading-tight">
+          <span className="text-[18px] font-bold leading-tight" style={{ color: '#007bff' }}>
             {format(parseISO(meeting.date), 'd')}
           </span>
         </div>
 
         {/* Details */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
-            <h3 className="font-semibold text-slate-900 dark:text-white text-sm">
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
+            <h3 className="font-semibold text-sm" style={{ color: 'var(--t1)' }}>
               {meeting.title}
             </h3>
             <Badge variant={variant}>{label}</Badge>
             {isPastMeeting && <Badge variant="gray">Completed</Badge>}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-            <span className="flex items-center gap-1">
-              <Clock size={12} />
+          <div className="flex flex-wrap items-center gap-4 text-xs" style={{ color: 'var(--t2)' }}>
+            <span className="flex items-center gap-1.5">
+              <Clock size={12} style={{ color: 'var(--t3)' }} />
               {meeting.time}
             </span>
-            <span className="flex items-center gap-1">
-              <User size={12} />
-              {meeting.attendee_name}
+            {/* Attendee avatars */}
+            <span className="flex items-center gap-1.5">
+              <Users size={12} style={{ color: 'var(--t3)' }} />
+              <div className="flex -space-x-1">
+                {meeting.attendees.slice(0, 4).map((a, i) => (
+                  <div
+                    key={a.id}
+                    title={a.name}
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
+                    style={{ background: avatarColor(i), boxShadow: '0 0 0 2px var(--surface)' }}
+                  >
+                    {a.name.charAt(0).toUpperCase()}
+                  </div>
+                ))}
+                {meeting.attendees.length > 4 && (
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold"
+                    style={{ background: 'var(--surface-2)', color: 'var(--t2)', boxShadow: '0 0 0 2px var(--surface)' }}
+                  >
+                    +{meeting.attendees.length - 4}
+                  </div>
+                )}
+              </div>
+              <span>{meeting.attendees.map(a => a.name.split(' ')[0]).join(', ')}</span>
             </span>
           </div>
 
           {meeting.notes && (
             <div className="mt-2 flex items-start gap-1.5">
-              <StickyNote size={12} className="text-slate-400 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
-                {meeting.notes}
-              </p>
+              <StickyNote size={11} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--t3)' }} />
+              <p className="text-xs line-clamp-2" style={{ color: 'var(--t2)' }}>{meeting.notes}</p>
             </div>
           )}
         </div>
@@ -190,51 +355,61 @@ function MeetingCard({ meeting, onDelete }: {
         {/* Delete */}
         <button
           onClick={onDelete}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex-shrink-0"
+          className="p-1.5 rounded-lg transition-colors flex-shrink-0"
+          style={{ color: 'var(--t3)' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#ef4444'; (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.08)' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--t3)'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
           aria-label="Delete meeting"
         >
-          <Trash2 size={15} />
+          <Trash2 size={14} />
         </button>
       </CardBody>
     </Card>
   )
 }
 
-// ─── Empty State ───────────────────────────────────────────────────────────────
+// ─── Empty State ──────────────────────────────────────────────────────────────
 function EmptyState({ onSchedule }: { onSchedule: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-slate-900 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
-      <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-4">
-        <CalendarDays size={28} className="text-blue-500" />
+    <div
+      className="flex flex-col items-center justify-center py-20 text-center rounded-2xl"
+      style={{ border: '1.5px dashed var(--border-strong)', background: 'var(--surface)' }}
+    >
+      <div
+        className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
+        style={{ background: 'rgba(0,123,255,0.08)' }}
+      >
+        <CalendarDays size={26} style={{ color: '#007bff' }} />
       </div>
-      <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">
-        No meetings scheduled
-      </h3>
-      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mb-6">
+      <h3 className="text-base font-bold mb-1" style={{ color: 'var(--t1)' }}>No meetings scheduled</h3>
+      <p className="text-sm mb-6 max-w-xs" style={{ color: 'var(--t2)' }}>
         Schedule your first team meeting to keep everyone aligned.
       </p>
-      <Button onClick={onSchedule}>
-        <Plus size={15} />
-        Schedule Meeting
-      </Button>
+      <Button onClick={onSchedule}><Plus size={14} /> Schedule Meeting</Button>
     </div>
   )
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── Section header ───────────────────────────────────────────────────────────
+function SectionHead({ label }: { label: string }) {
+  return (
+    <p className="text-[10px] font-bold uppercase tracking-[0.10em] mb-3" style={{ color: 'var(--t3)' }}>
+      {label}
+    </p>
+  )
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
 export default function MeetingsPage() {
   const { meetings, deleteMeeting } = useMeetings()
   const [showForm, setShowForm] = useState(false)
 
-  const now = new Date()
-
   const { upcoming, past } = useMemo(() => {
-    const upcoming: typeof meetings = []
-    const past: typeof meetings = []
+    const upcoming: Meeting[] = []
+    const past: Meeting[]     = []
     for (const m of meetings) {
-      const dt = parseISO(`${m.date}T${m.time}`)
-      if (isPast(dt)) past.push(m)
-      else             upcoming.push(m)
+      if (isPast(parseISO(`${m.date}T${m.time}`))) past.push(m)
+      else                                           upcoming.push(m)
     }
     return { upcoming, past: past.slice().reverse() }
   }, [meetings])
@@ -242,94 +417,66 @@ export default function MeetingsPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Meeting Schedule</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            {format(now, 'EEEE, MMMM d, yyyy')} · {meetings.length} meeting{meetings.length !== 1 ? 's' : ''} total
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--t1)' }}>Meeting Schedule</h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--t2)' }}>
+            {format(new Date(), 'EEEE, MMMM d, yyyy')} · {meetings.length} meeting{meetings.length !== 1 ? 's' : ''} total
           </p>
         </div>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus size={15} />
-          Schedule Meeting
-        </Button>
+        <Button onClick={() => setShowForm(true)}><Plus size={14} /> Schedule Meeting</Button>
       </div>
 
-      {/* ── Stats row ── */}
+      {/* Stats */}
       {meetings.length > 0 && (
         <div className="grid grid-cols-2 gap-4">
-          <Card>
-            <CardBody className="flex items-center gap-3 py-4">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
-                <CalendarClock size={18} className="text-white" />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-slate-900 dark:text-white">{upcoming.length}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Upcoming</p>
-              </div>
-            </CardBody>
-          </Card>
-          <Card>
-            <CardBody className="flex items-center gap-3 py-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center flex-shrink-0">
-                <CalendarCheck size={18} className="text-white" />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-slate-900 dark:text-white">{past.length}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Completed</p>
-              </div>
-            </CardBody>
-          </Card>
+          {[
+            { count: upcoming.length, label: 'Upcoming',  icon: CalendarClock, color: '#007bff' },
+            { count: past.length,     label: 'Completed', icon: CalendarCheck, color: '#059669' },
+          ].map(({ count, label, icon: Icon, color }) => (
+            <Card key={label}>
+              <CardBody className="flex items-center gap-3 py-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                     style={{ background: `${color}1a` }}>
+                  <Icon size={18} style={{ color }} />
+                </div>
+                <div>
+                  <p className="text-xl font-bold" style={{ color: 'var(--t1)' }}>{count}</p>
+                  <p className="text-xs font-medium" style={{ color: 'var(--t2)' }}>{label}</p>
+                </div>
+              </CardBody>
+            </Card>
+          ))}
         </div>
       )}
 
-      {/* ── Empty state ── */}
-      {meetings.length === 0 && (
-        <EmptyState onSchedule={() => setShowForm(true)} />
-      )}
+      {meetings.length === 0 && <EmptyState onSchedule={() => setShowForm(true)} />}
 
-      {/* ── Upcoming ── */}
       {upcoming.length > 0 && (
         <div>
-          <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">
-            Upcoming
-          </h2>
+          <SectionHead label="Upcoming" />
           <div className="space-y-2">
             {upcoming.map(m => (
-              <MeetingCard
-                key={m.id}
-                meeting={m}
-                onDelete={() => {
-                  if (confirm('Remove this meeting?')) deleteMeeting(m.id)
-                }}
-              />
+              <MeetingCard key={m.id} meeting={m}
+                onDelete={() => { if (confirm('Remove this meeting?')) deleteMeeting(m.id) }} />
             ))}
           </div>
         </div>
       )}
 
-      {/* ── Past ── */}
       {past.length > 0 && (
         <div>
-          <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">
-            Past Meetings
-          </h2>
+          <SectionHead label="Past Meetings" />
           <div className="space-y-2">
             {past.map(m => (
-              <MeetingCard
-                key={m.id}
-                meeting={m}
-                onDelete={() => {
-                  if (confirm('Remove this meeting?')) deleteMeeting(m.id)
-                }}
-              />
+              <MeetingCard key={m.id} meeting={m}
+                onDelete={() => { if (confirm('Remove this meeting?')) deleteMeeting(m.id) }} />
             ))}
           </div>
         </div>
       )}
 
-      {/* ── Modal ── */}
       <Modal open={showForm} title="Schedule a Meeting" onClose={() => setShowForm(false)}>
         <ScheduleForm onClose={() => setShowForm(false)} />
       </Modal>

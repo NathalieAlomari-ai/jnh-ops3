@@ -14,7 +14,21 @@ export type PreserviceStage =
   | 'solution_scope'
   | 'technical_financial_offer'
   | 'closed_won'
-export type AiSummaryType = 'weekly_standup' | 'outreach_draft'
+export type AiSummaryType = 'weekly_standup' | 'outreach_draft' | 'monthly_report'
+
+export type ContributionTag =
+  | 'Ideas'
+  | 'Outreach'
+  | 'Meetings'
+  | 'Entities'
+  | 'Applications'
+  | 'Partnerships'
+  | 'Deliverables'
+
+export const CONTRIBUTION_TAGS: ContributionTag[] = [
+  'Ideas', 'Outreach', 'Meetings', 'Entities',
+  'Applications', 'Partnerships', 'Deliverables',
+]
 export type AiSummaryStatus = 'pending' | 'generating' | 'done' | 'error'
 export type AiSummaryTrigger = 'manual' | 'n8n'
 
@@ -24,6 +38,21 @@ export interface WeeklySummaryReport {
   task_progress: string
   strategy_update: string
   action_items_risks: string
+}
+
+/** Per-tag section in a monthly report */
+export interface MonthlyTagSection {
+  tag: string
+  summary: string
+  highlights: string[]
+}
+
+/** Payload for monthly contribution reports */
+export interface MonthlyReport {
+  month: string          // e.g. "April 2026"
+  executive_summary: string
+  sections: MonthlyTagSection[]
+  overall_impact: string
 }
 
 export interface Profile {
@@ -60,6 +89,7 @@ export interface DailyUpdate {
   did_today: string
   blockers: string | null
   plan_tomorrow: string | null
+  contribution_tags: string[]
   created_at: string
   updated_at: string
 }
@@ -73,6 +103,7 @@ export interface ShmTask {
   assignee_id: string
   initiative_id: string | null
   due_date: string | null
+  contribution_tags: string[]
   created_at: string
   updated_at: string
 }

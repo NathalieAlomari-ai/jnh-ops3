@@ -1,58 +1,217 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Onest:wght@600;700;800;900&display=swap');
 
-/* ── Tailwind v4: class-based dark mode ──────────────────────── */
+/* ── Tailwind v4 dark mode ───────────────────────────────────── */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ── Brand Design Tokens ─────────────────────────────────────── */
+/* ── Register custom fonts ───────────────────────────────────── */
+@theme {
+  --font-sans:    'DM Sans', system-ui, sans-serif;
+  --font-display: 'Onest', system-ui, sans-serif;
+}
+
+/* ── JNH Brand Tokens ────────────────────────────────────────── */
 :root {
-  --color-accent:        #2563eb;   /* blue-600  — primary CTA, active nav */
-  --color-accent-hover:  #1d4ed8;   /* blue-700  — hover state            */
-  --color-accent-light:  #eff6ff;   /* blue-50   — subtle bg highlight     */
-  --color-accent-ring:   #93c5fd;   /* blue-300  — focus ring              */
+  /* Brand */
+  --blue:            #007bff;
+  --blue-hover:      #0069d9;
+  --cyan:            #0cc0df;
+  --cyan-hover:      #0aaecb;
+  --deep-blue:       #2b70e4;
 
-  --color-sidebar-bg:    #0f172a;   /* slate-900 — sidebar background      */
-  --color-sidebar-text:  #94a3b8;   /* slate-400 — inactive nav text       */
-  --color-sidebar-hover: #1e293b;   /* slate-800 — nav hover bg            */
+  /* Gradient */
+  --g-brand:         linear-gradient(135deg, #007bff 0%, #0cc0df 100%);
+  --g-brand-hover:   linear-gradient(135deg, #0069d9 0%, #0aaecb 100%);
 
-  --color-bg-page:       #f8fafc;   /* slate-50  — main content bg         */
-  --color-surface:       #ffffff;   /* white     — card/panel bg           */
-  --color-border:        #e2e8f0;   /* slate-200 — borders                 */
+  /* Sidebar */
+  --sb-bg:           #1f1f1f;
+  --sb-hover:        rgba(255,255,255,0.055);
+  --sb-active-bg:    rgba(0,123,255,0.14);
+  --sb-active-bar:   #007bff;
+  --sb-text:         #858585;
+  --sb-text-active:  #f0f0f0;
+  --sb-label:        rgba(255,255,255,0.22);
+  --sb-divider:      rgba(255,255,255,0.07);
 
-  --color-text-primary:  #0f172a;   /* slate-900 — main headings           */
-  --color-text-secondary:#475569;   /* slate-600 — support text            */
-  --color-text-muted:    #94a3b8;   /* slate-400 — timestamps, metadata    */
+  /* Page */
+  --bg:              #f4f6f9;
+  --surface:         #ffffff;
+  --surface-2:       #f9fafc;
+  --border:          #e5e9f0;
+  --border-strong:   #d3d9e4;
+
+  /* Text */
+  --t1:              #111827;
+  --t2:              #4b5568;
+  --t3:              #9ca3af;
+
+  /* Shadows */
+  --shadow-xs:       0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm:       0 1px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:       0 4px 16px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-blue:     0 4px 16px rgba(0,123,255,0.28);
+  --shadow-blue-lg:  0 8px 28px rgba(0,123,255,0.30);
+
+  /* Ring */
+  --ring:            rgba(0,123,255,0.25);
 }
 
-* {
-  box-sizing: border-box;
-}
+/* ── Reset ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── Base ────────────────────────────────────────────────────── */
+html { font-size: 15px; }
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, 'Segoe UI', sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--color-bg-page);
-  color: var(--color-text-primary);
+  background-color: var(--bg);
+  color: var(--t1);
+  letter-spacing: -0.008em;
+  line-height: 1.6;
 }
 
-#root {
-  min-height: 100vh;
+#root { min-height: 100vh; }
+
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
-/* ── Global Form Focus Ring → Blue ───────────────────────────── */
+/* ── Brand button ────────────────────────────────────────────── */
+.btn-brand {
+  background: var(--g-brand);
+  color: #fff;
+  box-shadow: var(--shadow-blue);
+  border: none;
+}
+.btn-brand:hover:not(:disabled) {
+  background: var(--g-brand-hover);
+  box-shadow: var(--shadow-blue-lg);
+  transform: translateY(-1px);
+}
+.btn-brand:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-blue);
+}
+.btn-brand:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Form focus ──────────────────────────────────────────────── */
 input:focus, textarea:focus, select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-accent-ring);
+  box-shadow: 0 0 0 3px var(--ring);
+  border-color: var(--blue) !important;
 }
 
-/* ── Scrollbar (subtle, professional) ────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+input, textarea, select {
+  font-family: var(--font-sans);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
 
-/* ── Text selection ──────────────────────────────────────────── */
-::selection { background: #bfdbfe; color: #1e3a5f; }
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar          { width: 4px; height: 4px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: #d1d5db; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 
+/* ── Selection ───────────────────────────────────────────────── */
+::selection { background: rgba(0,123,255,0.14); color: #00408a; }
+
+/* ════════════════════════════════════════════════════════════════
+   DARK MODE — complete token overrides
+   ════════════════════════════════════════════════════════════════ */
+.dark {
+  color-scheme: dark;
+
+  /* Page layers */
+  --bg:              #0d1117;
+  --surface:         #161b22;
+  --surface-2:       #1c2432;
+  --border:          rgba(255, 255, 255, 0.07);
+  --border-strong:   rgba(255, 255, 255, 0.13);
+
+  /* Text */
+  --t1:    #e6edf3;
+  --t2:    #7d8590;
+  --t3:    #484f58;
+
+  /* Sidebar — slightly deeper for contrast */
+  --sb-bg:          #0d1117;
+  --sb-hover:       rgba(255,255,255,0.05);
+  --sb-active-bg:   rgba(0,123,255,0.18);
+  --sb-active-bar:  #007bff;
+  --sb-text:        #636e7b;
+  --sb-text-active: #e6edf3;
+  --sb-label:       rgba(255,255,255,0.20);
+  --sb-divider:     rgba(255,255,255,0.06);
+
+  /* Shadows — deeper on dark backgrounds */
+  --shadow-xs:        0 1px 2px rgba(0,0,0,0.60);
+  --shadow-sm:        0 1px 4px rgba(0,0,0,0.50), 0 1px 2px rgba(0,0,0,0.40);
+  --shadow-md:        0 4px 16px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.40);
+  --shadow-blue:      0 4px 20px rgba(0,123,255,0.45);
+  --shadow-blue-lg:   0 8px 32px rgba(0,123,255,0.50);
+
+  /* Focus ring — brighter on dark */
+  --ring: rgba(0,123,255,0.40);
+}
+
+/* ── Dark: body ────────────────────────────────────────────────── */
+.dark body {
+  background-color: var(--bg);
+  color: var(--t1);
+}
+
+/* ── Dark: inputs and selects ─────────────────────────────────── */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--surface-2) !important;
+  border-color: var(--border-strong) !important;
+  color: var(--t1) !important;
+  color-scheme: dark;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder { color: var(--t3) !important; }
+
+/* ── Dark: Tailwind hardcoded class overrides ─────────────────── */
+/* Cards / panels */
+.dark .bg-white                       { background-color: var(--surface) !important; }
+.dark .bg-gray-50, .dark .bg-slate-50 { background-color: var(--surface-2) !important; }
+.dark .bg-slate-100, .dark .bg-gray-100 { background-color: rgba(255,255,255,0.04) !important; }
+
+/* Text */
+.dark .text-gray-900, .dark .text-slate-900 { color: var(--t1) !important; }
+.dark .text-gray-700, .dark .text-slate-700 { color: #c9d1d9 !important; }
+.dark .text-gray-600, .dark .text-slate-600 { color: var(--t2) !important; }
+.dark .text-gray-500, .dark .text-slate-500 { color: #6e7681 !important; }
+.dark .text-gray-400, .dark .text-slate-400 { color: var(--t3) !important; }
+
+/* Borders */
+.dark .border-gray-100, .dark .border-gray-200 { border-color: var(--border) !important; }
+.dark .border-gray-300, .dark .border-slate-200 { border-color: var(--border-strong) !important; }
+.dark .divide-gray-50 > * + * { border-color: var(--border) !important; }
+.dark .divide-gray-100 > * + * { border-color: var(--border) !important; }
+
+/* Status bar / section dividers inside cards */
+.dark [style*="border-b"] { border-color: var(--border) !important; }
+
+/* Avatars / colored chips — keep vibrant on dark */
+.dark .bg-blue-50  { background-color: rgba(0,123,255,0.12) !important; }
+.dark .bg-emerald-50 { background-color: rgba(5,150,105,0.12) !important; }
+.dark .bg-orange-50  { background-color: rgba(234,88,12,0.12) !important; }
+
+/* Scrollbar on dark */
+.dark ::-webkit-scrollbar-thumb { background: #30363d; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+/* Selection on dark */
+.dark ::selection { background: rgba(0,123,255,0.30); color: #b3d4ff; }
+
+/* ── Dark: form labels (Tailwind utility classes used across pages) */
+.dark .text-slate-700 { color: #c9d1d9 !important; }
+.dark label { color: var(--t2) !important; }

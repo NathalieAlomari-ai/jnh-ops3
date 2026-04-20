@@ -325,16 +325,16 @@ function MeetingCard({ meeting, onDelete }: { meeting: Meeting; onDelete: () => 
                   <div
                     key={a.id}
                     title={a.name}
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold ring-2"
-                    style={{ background: avatarColor(i), ringColor: 'var(--surface)' }}
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
+                    style={{ background: avatarColor(i), boxShadow: '0 0 0 2px var(--surface)' }}
                   >
                     {a.name.charAt(0).toUpperCase()}
                   </div>
                 ))}
                 {meeting.attendees.length > 4 && (
                   <div
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold ring-2"
-                    style={{ background: 'var(--surface-2)', color: 'var(--t2)', ringColor: 'var(--surface)' }}
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold"
+                    style={{ background: 'var(--surface-2)', color: 'var(--t2)', boxShadow: '0 0 0 2px var(--surface)' }}
                   >
                     +{meeting.attendees.length - 4}
                   </div>

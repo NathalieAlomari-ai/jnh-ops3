@@ -7,7 +7,6 @@ import {
 import { useGenerateMonthlyReport } from '@/hooks/useMonthlyReport'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfiles } from '@/hooks/useProfiles'
-import { Button } from '@/components/ui/Button'
 import { Card, CardBody } from '@/components/ui/Card'
 import type { MonthlyReport, MonthlyTagSection } from '@/types/database'
 

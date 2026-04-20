@@ -23,6 +23,7 @@ function StandupForm({ onClose }: { onClose: () => void }) {
       did_today: form.did_today,
       blockers: form.blockers || null,
       plan_tomorrow: form.plan_tomorrow || null,
+      contribution_tags: [],
     })
     onClose()
   }

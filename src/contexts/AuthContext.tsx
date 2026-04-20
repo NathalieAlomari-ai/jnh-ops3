@@ -14,6 +14,7 @@ interface AuthContextValue {
   signOut: () => Promise<void>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -24,13 +25,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function fetchProfile(userId: string, mounted: { current: boolean }) {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
+      if (error) console.error('[auth] failed to load profile:', error)
       if (mounted.current) setProfile(data ?? null)
-    } catch {
+    } catch (err) {
+      console.error('[auth] profile fetch threw:', err)
       if (mounted.current) setProfile(null)
     }
   }
@@ -46,19 +49,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // onAuthStateChange always fires INITIAL_SESSION immediately with the
     // current session from localStorage — no network call needed.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
+      async (_event, newSession) => {
         if (!mounted.current) return
 
-        clearTimeout(timeout)
         setSession(newSession)
         setUser(newSession?.user ?? null)
-        setLoading(false)
 
         if (newSession?.user) {
-          fetchProfile(newSession.user.id, mounted)
+          await fetchProfile(newSession.user.id, mounted)
         } else {
           setProfile(null)
         }
+
+        if (!mounted.current) return
+        clearTimeout(timeout)
+        setLoading(false)
       }
     )
 

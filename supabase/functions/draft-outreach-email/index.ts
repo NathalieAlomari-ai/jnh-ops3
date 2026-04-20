@@ -46,7 +46,7 @@ ${outreach.contact_email ? `Email: ${outreach.contact_email}` : ''}
 Pipeline Stage: ${outreach.stage.replace('_', ' ')}
 ${outreach.notes ? `Previous Notes: ${outreach.notes}` : ''}
 ${outreach.last_contact_date ? `Last Contact: ${outreach.last_contact_date}` : ''}
-Sender: ${(outreach as any).profiles.full_name}
+Sender: ${(outreach as { profiles: { full_name: string } }).profiles.full_name}
 
 Write a professional email that:
 - Is warm but direct

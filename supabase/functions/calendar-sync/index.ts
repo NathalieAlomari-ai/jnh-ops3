@@ -18,6 +18,12 @@ interface CalendarEvent {
   meeting_url?: string
 }
 
+interface ProfileRow {
+  id: string
+  email: string
+  full_name: string
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -40,11 +46,11 @@ serve(async (req) => {
     .from('profiles')
     .select('id, email, full_name')
 
-  const profileByEmail = Object.fromEntries(
-    (profiles ?? []).map((p: any) => [p.email.toLowerCase(), p])
+  const profileByEmail: Record<string, ProfileRow> = Object.fromEntries(
+    ((profiles ?? []) as ProfileRow[]).map((p) => [p.email.toLowerCase(), p])
   )
 
-  const results = []
+  const results: { event: string; start: string; matched_attendees: string[] }[] = []
   for (const event of events ?? []) {
     const matchedAttendees = event.attendees
       .map(e => profileByEmail[e.toLowerCase()])
@@ -53,7 +59,7 @@ serve(async (req) => {
     results.push({
       event: event.title,
       start: event.start,
-      matched_attendees: matchedAttendees.map((p: any) => p.full_name),
+      matched_attendees: matchedAttendees.map((p) => p.full_name),
     })
   }
 

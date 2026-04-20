@@ -23,52 +23,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
-  async function fetchProfile(userId: string, mounted: { current: boolean }) {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
-      if (error) console.error('[auth] failed to load profile:', error)
-      if (mounted.current) setProfile(data ?? null)
-    } catch (err) {
-      console.error('[auth] profile fetch threw:', err)
-      if (mounted.current) setProfile(null)
+  // Fetch profile whenever the user id changes.
+  // IMPORTANT: this runs OUTSIDE the onAuthStateChange callback. Calling supabase
+  // inside that callback deadlocks the auth client (known supabase-js issue).
+  useEffect(() => {
+    if (!user) {
+      setProfile(null)
+      return
     }
-  }
+    let cancelled = false
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) console.error('[auth] failed to load profile:', error)
+        setProfile((data as Profile | null) ?? null)
+      })
+    return () => { cancelled = true }
+  }, [user?.id])
 
   useEffect(() => {
-    const mounted = { current: true }
+    let mounted = true
 
     // Fallback: if Supabase never fires, unblock after 5s
     const timeout = setTimeout(() => {
-      if (mounted.current) setLoading(false)
+      if (mounted) setLoading(false)
     }, 5000)
 
-    // onAuthStateChange always fires INITIAL_SESSION immediately with the
-    // current session from localStorage — no network call needed.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        if (!mounted.current) return
+    // Hydrate initial session without depending on the auth-state event.
+    supabase.auth.getSession().then(({ data: { session: initial } }) => {
+      if (!mounted) return
+      setSession(initial)
+      setUser(initial?.user ?? null)
+      clearTimeout(timeout)
+      setLoading(false)
+    })
 
+    // Subsequent auth changes (sign-in, sign-out, token refresh).
+    // Keep this callback SYNCHRONOUS — do NOT await supabase calls here.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        if (!mounted) return
         setSession(newSession)
         setUser(newSession?.user ?? null)
-
-        if (newSession?.user) {
-          await fetchProfile(newSession.user.id, mounted)
-        } else {
-          setProfile(null)
-        }
-
-        if (!mounted.current) return
-        clearTimeout(timeout)
         setLoading(false)
       }
     )
 
     return () => {
-      mounted.current = false
+      mounted = false
       clearTimeout(timeout)
       subscription.unsubscribe()
     }

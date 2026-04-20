@@ -1,61 +1,81 @@
 import { NavLink } from 'react-router-dom'
 import {
-  LayoutDashboard,
-  ClipboardList,
-  FileText,
-  Briefcase,
-  SquareKanban,
-  GitMerge,
-  Users,
-  ShieldCheck,
-  LogOut,
-  Sun,
-  Moon,
-  CalendarDays,
+  LayoutDashboard, ClipboardList, FileText, Briefcase,
+  SquareKanban, GitMerge, Users, ShieldCheck, LogOut,
+  Sun, Moon, CalendarDays, BarChart3,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/contexts/ThemeContext'
-import { clsx } from 'clsx'
 
-// ─── Nav group config ─────────────────────────────────────────────────────────
-const WORKSPACE_ITEMS = [
-  { to: '/dashboard',        label: 'Dashboard',        icon: LayoutDashboard },
-  { to: '/standups',         label: 'Daily Standups',   icon: ClipboardList   },
-  { to: '/meetings',         label: 'Meeting Schedule', icon: CalendarDays    },
-  { to: '/weekly-summary',   label: 'Weekly Summary',   icon: FileText        },
-]
-
-const OPERATIONS_ITEMS = [
-  { to: '/projects',  label: 'Projects',   icon: Briefcase    },
-  { to: '/tasks',     label: 'Task Board', icon: SquareKanban },
-]
-
-const PIPELINE_ITEMS = [
-  { to: '/pipeline',  label: 'As-Is Studies', icon: GitMerge },
-]
-
-const SETTINGS_ITEMS = [
-  { to: '/team',  label: 'Team',  icon: Users },
-]
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-const linkClass = ({ isActive }: { isActive: boolean }) =>
-  clsx(
-    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-    'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
-    isActive
-      ? 'bg-blue-600 text-white'
-      : 'text-slate-400 hover:text-white hover:bg-slate-800'
-  )
-
-function NavGroup({ label, children }: { label: string; children: React.ReactNode }) {
+// ─── Logo mark (uses the real favicon.svg) ────────────────────────────────────
+function LogoMark() {
   return (
-    <div className="space-y-0.5">
-      <p className="px-3 pt-4 pb-1 text-[10px] font-semibold tracking-widest uppercase text-slate-500 select-none">
-        {label}
-      </p>
-      {children}
+    <div className="flex items-center gap-2.5">
+      <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center"
+           style={{ background: 'linear-gradient(135deg, #007bff 0%, #0cc0df 100%)' }}>
+        <img
+          src="/favicon.svg"
+          alt="JNH Systems Logo"
+          className="w-5 h-5 object-contain brightness-0 invert"
+        />
+      </div>
+      <div>
+        <p className="text-white font-bold text-[14px] leading-none tracking-tight"
+           style={{ fontFamily: 'var(--font-display)' }}>
+          JNH Systems
+        </p>
+        <p className="text-[11px] leading-none mt-0.5" style={{ color: 'var(--sb-text)' }}>
+          Ops Platform
+        </p>
+      </div>
     </div>
+  )
+}
+
+// ─── Nav link ────────────────────────────────────────────────────────────────
+function NavItem({ to, label, icon: Icon }: { to: string; label: string; icon: React.ElementType }) {
+  return (
+    <NavLink
+      to={to}
+      style={({ isActive }) =>
+        isActive
+          ? {
+              color: 'var(--sb-text-active)',
+              background: 'var(--sb-active-bg)',
+              borderLeft: '2.5px solid var(--sb-active-bar)',
+              paddingLeft: 'calc(0.75rem - 2.5px)',
+            }
+          : { color: 'var(--sb-text)', borderLeft: '2.5px solid transparent' }
+      }
+      className={({ isActive }) => [
+        'group flex items-center gap-2.5 py-[9px] pr-3 rounded-r-lg text-[13px] font-medium',
+        'transition-all duration-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-white/20',
+        'pl-[calc(0.75rem-2.5px)]',
+        !isActive && 'hover:bg-[var(--sb-hover)] hover:text-[#cccccc]',
+      ].filter(Boolean).join(' ')}
+    >
+      {({ isActive }) => (
+        <>
+          <Icon
+            size={15}
+            strokeWidth={isActive ? 2.2 : 1.8}
+            className="flex-shrink-0 transition-colors"
+            style={{ color: isActive ? '#007bff' : 'currentColor' }}
+          />
+          <span className="truncate">{label}</span>
+        </>
+      )}
+    </NavLink>
+  )
+}
+
+// ─── Section label ────────────────────────────────────────────────────────────
+function SectionLabel({ label }: { label: string }) {
+  return (
+    <p className="px-3 pt-5 pb-1 text-[10px] font-semibold uppercase tracking-[0.10em] select-none"
+       style={{ color: 'var(--sb-label)' }}>
+      {label}
+    </p>
   )
 }
 
@@ -64,120 +84,94 @@ export default function Sidebar() {
   const { profile, isAdmin, signOut } = useAuth()
   const { theme, toggleTheme } = useTheme()
 
-  return (
-    <aside className="w-64 min-h-screen bg-slate-900 flex flex-col border-r border-slate-800">
+  const initials = profile?.full_name
+    ?.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() ?? '?'
 
+  return (
+    <aside
+      className="w-[220px] min-h-screen flex flex-col flex-shrink-0 overflow-hidden"
+      style={{ backgroundColor: 'var(--sb-bg)' }}
+    >
       {/* ── Brand ── */}
-      <div className="px-6 py-5 border-b border-slate-800">
-        <span className="text-white font-bold text-base tracking-tight">JNH Systems</span>
-        <p className="text-slate-500 text-xs mt-0.5 font-medium">Internal Ops Platform</p>
+      <div className="px-4 py-5" style={{ borderBottom: '1px solid var(--sb-divider)' }}>
+        <LogoMark />
       </div>
 
-      {/* ── Navigation ── */}
-      <nav className="flex-1 px-3 py-2 overflow-y-auto" aria-label="Main navigation">
+      {/* ── Nav ── */}
+      <nav className="flex-1 py-2 overflow-y-auto" aria-label="Main navigation">
 
-        <NavGroup label="Workspace">
-          {WORKSPACE_ITEMS.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} className={linkClass}>
-              <Icon size={16} strokeWidth={2} />
-              {label}
-            </NavLink>
-          ))}
-        </NavGroup>
+        <SectionLabel label="Workspace" />
+        <NavItem to="/dashboard"      label="Dashboard"        icon={LayoutDashboard} />
+        <NavItem to="/standups"       label="Daily Standups"   icon={ClipboardList}   />
+        <NavItem to="/meetings"       label="Meeting Schedule" icon={CalendarDays}    />
+        <NavItem to="/weekly-summary"  label="Weekly Summary"   icon={FileText}        />
+        <NavItem to="/monthly-report" label="Monthly Report"   icon={BarChart3}       />
 
-        <NavGroup label="Operations">
-          {OPERATIONS_ITEMS.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} className={linkClass}>
-              <Icon size={16} strokeWidth={2} />
-              {label}
-            </NavLink>
-          ))}
-        </NavGroup>
+        <SectionLabel label="Operations" />
+        <NavItem to="/projects" label="Projects"   icon={Briefcase}    />
+        <NavItem to="/tasks"    label="Task Board" icon={SquareKanban} />
 
-        <NavGroup label="Pipeline">
-          {PIPELINE_ITEMS.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} className={linkClass}>
-              <Icon size={16} strokeWidth={2} />
-              {label}
-            </NavLink>
-          ))}
-        </NavGroup>
+        <SectionLabel label="Pipeline" />
+        <NavItem to="/pipeline" label="As-Is Studies" icon={GitMerge} />
 
-        <NavGroup label="Settings">
-          {SETTINGS_ITEMS.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} className={linkClass}>
-              <Icon size={16} strokeWidth={2} />
-              {label}
-            </NavLink>
-          ))}
-          {isAdmin && (
-            <NavLink to="/admin" className={linkClass}>
-              <ShieldCheck size={16} strokeWidth={2} />
-              Admin
-            </NavLink>
-          )}
-        </NavGroup>
+        <SectionLabel label="Settings" />
+        <NavItem to="/team" label="Team" icon={Users} />
+        {isAdmin && <NavItem to="/admin" label="Admin" icon={ShieldCheck} />}
 
       </nav>
 
-      {/* ── Footer: Theme toggle + User ── */}
-      <div className="px-3 py-4 border-t border-slate-800 space-y-2">
+      {/* ── Footer ── */}
+      <div className="px-3 py-3 space-y-1" style={{ borderTop: '1px solid var(--sb-divider)' }}>
 
-        {/* Theme Toggle */}
+        {/* Theme toggle */}
         <button
-          id="theme-toggle-btn"
           onClick={toggleTheme}
-          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all
+                     focus:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+          style={{ color: 'var(--sb-text)' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--sb-hover)'; (e.currentTarget as HTMLElement).style.color = '#ccc' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--sb-text)' }}
         >
-          <div className="relative w-4 h-4">
-            <Sun
-              size={16}
-              strokeWidth={2}
-              className={`absolute inset-0 transition-all duration-300 ${
-                theme === 'dark' ? 'opacity-100 rotate-0' : 'opacity-0 rotate-90'
-              }`}
-            />
-            <Moon
-              size={16}
-              strokeWidth={2}
-              className={`absolute inset-0 transition-all duration-300 ${
-                theme === 'light' ? 'opacity-100 rotate-0' : 'opacity-0 -rotate-90'
-              }`}
-            />
-          </div>
-          <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
-
-          {/* Pill indicator */}
-          <div className={`ml-auto w-8 h-4 rounded-full transition-colors flex items-center px-0.5 ${
-            theme === 'dark' ? 'bg-blue-600 justify-end' : 'bg-slate-600 justify-start'
-          }`}>
-            <div className="w-3 h-3 rounded-full bg-white shadow-sm" />
+          {theme === 'dark'
+            ? <Sun size={14} strokeWidth={2} />
+            : <Moon size={14} strokeWidth={2} />
+          }
+          <span className="flex-1 text-left">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+          {/* pill */}
+          <div className="relative w-7 h-3.5 rounded-full flex-shrink-0 transition-colors"
+               style={{ background: theme === 'dark' ? 'var(--blue)' : '#484848' }}>
+            <div className="absolute top-0.5 w-2.5 h-2.5 bg-white rounded-full shadow-sm transition-all duration-200"
+                 style={{ left: theme === 'dark' ? 'calc(100% - 11px)' : '2px' }} />
           </div>
         </button>
 
-        {/* Divider */}
-        <div className="border-t border-slate-800 mx-1" />
-
-        {/* User info */}
-        <div className="flex items-center gap-3 px-3 py-1.5">
-          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            {profile?.full_name?.charAt(0)?.toUpperCase() ?? '?'}
+        {/* User */}
+        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg"
+             style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center
+                          text-white text-[11px] font-bold"
+               style={{ background: 'var(--g-brand)' }}>
+            {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-white font-medium truncate">{profile?.full_name}</p>
-            <p className="text-xs text-slate-400 capitalize">{profile?.role}</p>
+            <p className="text-[12.5px] font-semibold text-white truncate leading-snug">
+              {profile?.full_name ?? '…'}
+            </p>
+            <p className="text-[11px] capitalize leading-snug" style={{ color: 'var(--sb-text)' }}>
+              {profile?.role ?? 'user'}
+            </p>
           </div>
+          <button
+            onClick={signOut}
+            title="Sign out"
+            className="flex-shrink-0 p-1 rounded-md transition-colors"
+            style={{ color: 'var(--sb-text)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#ff6b6b' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--sb-text)' }}
+          >
+            <LogOut size={13} strokeWidth={2} />
+          </button>
         </div>
-
-        {/* Sign out */}
-        <button
-          onClick={signOut}
-          className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-        >
-          <LogOut size={16} strokeWidth={2} />
-          Sign out
-        </button>
 
       </div>
     </aside>

@@ -1,17 +1,22 @@
 import { useState, useCallback } from 'react'
 
+export interface MeetingAttendee {
+  id: string
+  name: string
+}
+
 export interface Meeting {
   id: string
   title: string
-  date: string        // 'yyyy-MM-dd'
-  time: string        // 'HH:mm'
-  attendee_id: string
-  attendee_name: string
+  date: string          // 'yyyy-MM-dd'
+  time: string          // 'HH:mm'
+  attendees: MeetingAttendee[]
   notes: string
   created_at: string
 }
 
-const STORAGE_KEY = 'jnh_meetings_v1'
+// v2 — bumped because attendee model changed from single → array
+const STORAGE_KEY = 'jnh_meetings_v2'
 
 function load(): Meeting[] {
   try {

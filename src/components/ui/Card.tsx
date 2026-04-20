@@ -7,10 +7,14 @@ interface CardProps {
 
 export function Card({ children, className }: CardProps) {
   return (
-    <div className={clsx(
-      'bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-700/60 shadow-sm',
-      className
-    )}>
+    <div
+      className={clsx('rounded-2xl', className)}
+      style={{
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
+        boxShadow: 'var(--shadow-sm)',
+      }}
+    >
       {children}
     </div>
   )
@@ -18,10 +22,10 @@ export function Card({ children, className }: CardProps) {
 
 export function CardHeader({ children, className }: CardProps) {
   return (
-    <div className={clsx(
-      'px-6 py-4 border-b border-gray-100 dark:border-slate-700/60',
-      className
-    )}>
+    <div
+      className={clsx('px-5 py-4', className)}
+      style={{ borderBottom: '1px solid var(--border)' }}
+    >
       {children}
     </div>
   )
@@ -29,7 +33,7 @@ export function CardHeader({ children, className }: CardProps) {
 
 export function CardBody({ children, className }: CardProps) {
   return (
-    <div className={clsx('px-6 py-4', className)}>
+    <div className={clsx('px-5 py-4', className)}>
       {children}
     </div>
   )

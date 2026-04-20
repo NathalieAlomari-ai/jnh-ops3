@@ -16,7 +16,7 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
 
   useEffect(() => {
     if (!open) return
-    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
     closeRef.current?.focus()
     return () => document.removeEventListener('keydown', onKey)
@@ -31,22 +31,56 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
       aria-modal="true"
       aria-label={title}
     >
-      <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} aria-hidden="true" />
-      <div className={`relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl dark:shadow-2xl border border-transparent dark:border-slate-700/60 w-full ${sizeClass[size]} max-h-[90vh] flex flex-col`}>
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0"
+        style={{ background: 'rgba(10,14,26,0.50)', backdropFilter: 'blur(3px)' }}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Panel */}
+      <div
+        className={`relative w-full ${sizeClass[size]} max-h-[90vh] flex flex-col`}
+        style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 18,
+          boxShadow: '0 24px 64px rgba(0,0,0,0.16), 0 4px 16px rgba(0,0,0,0.08)',
+        }}
+      >
+        {/* Accent line */}
+        <div
+          className="h-0.5 w-full rounded-t-[18px]"
+          style={{ background: 'linear-gradient(90deg, #007bff 0%, #0cc0df 100%)' }}
+        />
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700/60">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-white">{title}</h2>
+        <div
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: '1px solid var(--border)' }}
+        >
+          <h2
+            className="text-[15px] font-bold"
+            style={{ color: 'var(--t1)', fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}
+          >
+            {title}
+          </h2>
           <button
             ref={closeRef}
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             aria-label="Close dialog"
+            className="p-1.5 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#007bff]"
+            style={{ color: 'var(--t3)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg)'; (e.currentTarget as HTMLElement).style.color = 'var(--t1)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--t3)' }}
           >
-            <X size={20} />
+            <X size={16} />
           </button>
         </div>
+
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="flex-1 overflow-y-auto px-6 py-5">
           {children}
         </div>
       </div>

@@ -8,7 +8,7 @@ interface CardProps {
 export function Card({ children, className }: CardProps) {
   return (
     <div
-      className={clsx('rounded-2xl', className)}
+      className={clsx('rounded-xl', className)}
       style={{
         background: 'var(--surface)',
         border: '1px solid var(--border)',

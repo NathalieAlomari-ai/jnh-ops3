@@ -63,6 +63,8 @@ export interface Profile {
   department: string | null
   job_title: string | null
   avatar_url: string | null
+  phone: string | null
+  whatsapp_number: string | null
   created_at: string
   updated_at: string
 }

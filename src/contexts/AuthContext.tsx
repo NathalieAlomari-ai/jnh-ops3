@@ -32,70 +32,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    let mounted = true;
+    const initializeAuth = async () => {
+      // 1. جلب الجلسة الحالية
+      const { data: { session } } = await supabase.auth.getSession()
+      setSession(session)
+      setUser(session?.user ?? null)
 
-    async function initialize() {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession()
-        if (error) throw error
+      // 2. لو فيه مستخدم، جيب بياناته
+      if (session?.user) {
+        await fetchProfile(session.user.id)
+      }
+      // 3. قفل علامة التحميل فوراً
+      setLoading(false)
+    }
 
-        if (mounted) {
-          setSession(session)
-          setUser(session?.user ?? null)
-        }
+    initializeAuth()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        // لو حصل أي تغيير (دخول أو خروج)، حدث البيانات واقفل التحميل
+        setSession(session)
+        setUser(session?.user ?? null)
 
         if (session?.user) {
           await fetchProfile(session.user.id)
+        } else {
+          setProfile(null)
         }
-      } catch (err) {
-        console.error('Error getting session:', err)
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    initialize()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        if (!mounted) return
-        
-        try {
-          setSession(newSession)
-          setUser(newSession?.user ?? null)
-
-          if (newSession?.user) {
-            await fetchProfile(newSession.user.id)
-          } else {
-            setProfile(null)
-          }
-        } catch (err) {
-          console.error('Error on auth state change:', err)
-        } finally {
-          if (mounted) setLoading(false)
-        }
+        setLoading(false) // دي الضمان إن الشاشة متفضلش معلقة
       }
     )
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe()
-    }
+    return () => subscription.unsubscribe()
   }, [])
+
+  const isAdmin = profile?.role === 'admin'
 
   async function signIn(email: string, password: string) {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return { error }
+    return { error: error as Error | null }
   }
 
   async function signInWithMagicLink(email: string) {
-    const { error } = await supabase.auth.signInWithOtp({ 
-      email,
-      options: {
-        emailRedirectTo: window.location.origin
-      }
-    })
-    return { error }
+    const { error } = await supabase.auth.signInWithOtp({ email })
+    return { error: error as Error | null }
   }
 
   async function signOut() {
@@ -103,16 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      profile,
-      session,
-      loading,
-      isAdmin: profile?.role === 'admin',
-      signIn,
-      signInWithMagicLink,
-      signOut,
-    }}>
+    <AuthContext.Provider value={{ user, profile, session, loading, isAdmin, signIn, signInWithMagicLink, signOut }}>
       {children}
     </AuthContext.Provider>
   )

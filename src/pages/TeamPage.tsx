@@ -12,10 +12,12 @@ import type { Profile } from '@/types/database'
 function ProfileForm({ profile, onClose }: { profile: Profile; onClose: () => void }) {
   const updateProfile = useUpdateProfile()
   const [form, setForm] = useState({
-    full_name:  profile.full_name,
-    job_title:  profile.job_title  ?? '',
-    department: profile.department ?? '',
-    avatar_url: profile.avatar_url ?? '',
+    full_name:       profile.full_name,
+    job_title:       profile.job_title       ?? '',
+    department:      profile.department      ?? '',
+    avatar_url:      profile.avatar_url      ?? '',
+    phone:           profile.phone           ?? '',
+    whatsapp_number: profile.whatsapp_number ?? '',
   })
 
   async function handleSubmit(e: React.FormEvent) {
@@ -26,18 +28,27 @@ function ProfileForm({ profile, onClose }: { profile: Profile; onClose: () => vo
 
   const inputCls = 'w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow'
 
+  const fields: { key: keyof typeof form; label: string; placeholder?: string }[] = [
+    { key: 'full_name',       label: 'Full Name' },
+    { key: 'job_title',       label: 'Job Title' },
+    { key: 'department',      label: 'Department' },
+    { key: 'avatar_url',      label: 'Avatar URL', placeholder: 'https://…' },
+    { key: 'phone',           label: 'Phone' },
+    { key: 'whatsapp_number', label: 'WhatsApp Number', placeholder: '+9661234567890' },
+  ]
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {(['full_name', 'job_title', 'department', 'avatar_url'] as const).map(field => (
-        <div key={field}>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 capitalize">
-            {field.replace('_', ' ')}
+      {fields.map(({ key, label, placeholder }) => (
+        <div key={key}>
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">
+            {label}
           </label>
           <input
             className={inputCls}
-            value={form[field]}
-            onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
-            placeholder={field === 'avatar_url' ? 'https://…' : ''}
+            value={form[key]}
+            onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+            placeholder={placeholder ?? ''}
           />
         </div>
       ))}

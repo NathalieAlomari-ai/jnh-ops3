@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { Badge } from '@/components/ui/Badge'
 import { triggerWebhook } from '@/lib/webhook'
+import { supabase } from '@/lib/supabase'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function dateLabel(date: string): { label: string; variant: 'green' | 'blue' | 'gray' } {
@@ -154,6 +155,8 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [notes, setNotes]           = useState('')
   const [saving, setSaving]         = useState(false)
+  const [notifying, setNotifying]   = useState(false)
+  const [status, setStatus]         = useState<{ ok: boolean; message: string } | null>(null)
 
   const inputCls = [
     'w-full px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all',
@@ -173,10 +176,12 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
         ? `Meeting with ${attendees[0].name}`
         : `Team meeting — ${attendees.map(a => a.name.split(' ')[0]).join(', ')}`)
 
+    // Phase 1: save the meeting
     setSaving(true)
     const meeting = addMeeting({ title: autoTitle, date, time, attendees, notes })
+    setSaving(false)
 
-    // n8n webhook — fire and forget
+    // n8n webhook — fire and forget (unchanged)
     triggerWebhook({
       event: 'meeting.scheduled',
       meeting: {
@@ -190,8 +195,32 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
       attendees,
     })
 
-    setSaving(false)
-    onClose()
+    // Phase 2: send notifications via edge function
+    setNotifying(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('notify-meeting', {
+        body: {
+          meeting: { title: meeting.title, date: meeting.date, time: meeting.time, notes: meeting.notes },
+          attendees,
+        },
+      })
+
+      if (error) throw error
+      
+      // If the edge function ran but Twilio/Resend reported failures, it returns success: false
+      if (data && data.success === false) {
+        console.error('Notification failures detailed report:', data)
+        throw new Error('Not all notifications succeeded')
+      }
+
+      setStatus({ ok: true, message: 'Meeting scheduled! Team notified via email & WhatsApp.' })
+      setTimeout(onClose, 2000)
+    } catch (err) {
+      console.error('Submission error:', err)
+      setStatus({ ok: false, message: 'Meeting saved but notifications failed — please check Console for details.' })
+    } finally {
+      setNotifying(false)
+    }
   }
 
   return (
@@ -270,13 +299,189 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
         />
       </div>
 
+      {/* Status banner */}
+      {status && (
+        <div
+          className="rounded-xl px-4 py-3 text-[13px] font-medium"
+          style={{
+            background: status.ok ? 'rgba(5,150,105,0.08)' : 'rgba(217,119,6,0.08)',
+            border: `1.5px solid ${status.ok ? 'rgba(5,150,105,0.25)' : 'rgba(217,119,6,0.3)'}`,
+            color: status.ok ? '#059669' : '#b45309',
+          }}
+        >
+          {status.ok ? '✅ ' : '⚠️ '}{status.message}
+        </div>
+      )}
+
       <div className="flex gap-3 pt-1">
-        <Button type="submit" disabled={saving || selectedIds.size === 0}>
-          {saving ? 'Scheduling…' : 'Schedule Meeting'}
+        <Button type="submit" disabled={saving || notifying || !!status || selectedIds.size === 0}>
+          {saving ? 'Scheduling…' : notifying ? 'Notifying team…' : 'Schedule Meeting'}
         </Button>
-        <Button type="button" variant="secondary" onClick={onClose}>Cancel</Button>
+        <Button type="button" variant="secondary" onClick={onClose}>
+          {status ? 'Close' : 'Cancel'}
+        </Button>
       </div>
     </form>
+  )
+}
+
+// ─── Summary Modal ────────────────────────────────────────────────────────────
+function SummaryModal({
+  meeting,
+  onClose,
+  onSaved,
+}: {
+  meeting: Meeting
+  onClose: () => void
+  onSaved: (summary: string) => void
+}) {
+  const { saveSummary } = useMeetings()
+
+  const [notes, setNotes]           = useState(meeting.notes ?? '')
+  const [generating, setGenerating] = useState(false)
+  const [saving, setSaving]         = useState(false)
+  const [error, setError]           = useState<string | null>(null)
+  const [result, setResult]         = useState<{
+    key_decisions: string
+    action_items: string
+    next_steps: string
+  } | null>(null)
+
+  // Pre-fill with existing summary sections if already saved
+  const existingSummary = meeting.summary
+  const [savedBanner, setSavedBanner] = useState(false)
+
+  async function handleGenerate() {
+    if (!notes.trim()) return
+    setGenerating(true)
+    setError(null)
+    setResult(null)
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke('summarize-meeting', {
+        body: { notes: notes.trim(), meeting_title: meeting.title },
+      })
+      if (fnErr) throw fnErr
+      if (data?.error) throw new Error(data.error)
+      setResult(data)
+    } catch (err) {
+      setError((err as Error).message ?? 'Something went wrong')
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  async function handleSave() {
+    if (!result) return
+    setSaving(true)
+    const summaryText =
+      `Key Decisions:\n${result.key_decisions}\n\nAction Items:\n${result.action_items}\n\nNext Steps:\n${result.next_steps}`
+    try {
+      const { error: updateErr } = await supabase
+        .from('meetings')
+        .update({ summary: summaryText })
+        .eq('id', meeting.id)
+      if (updateErr) throw updateErr
+      saveSummary(meeting.id, summaryText)
+      onSaved(summaryText)
+      setSavedBanner(true)
+      setTimeout(onClose, 1500)
+    } catch (err) {
+      setError((err as Error).message ?? 'Failed to save')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const inputCls = 'w-full px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all border-[1.5px]'
+
+  return (
+    <div className="space-y-4">
+      {/* Existing summary preview */}
+      {existingSummary && !result && (
+        <div
+          className="rounded-xl px-4 py-3 text-[12px]"
+          style={{ background: 'rgba(5,150,105,0.06)', border: '1.5px solid rgba(5,150,105,0.2)', color: 'var(--t2)', whiteSpace: 'pre-wrap' }}
+        >
+          <p className="font-semibold text-[11px] uppercase tracking-wide mb-1.5" style={{ color: '#059669' }}>Saved Summary</p>
+          {existingSummary}
+        </div>
+      )}
+
+      {/* Notes textarea */}
+      <div>
+        <label className="block text-[12px] font-semibold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
+          Meeting Notes
+        </label>
+        <textarea
+          rows={5}
+          className={inputCls}
+          placeholder="Paste or type the meeting notes here…"
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
+          style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--t1)', resize: 'vertical' }}
+        />
+      </div>
+
+      <Button onClick={handleGenerate} disabled={generating || !notes.trim()}>
+        {generating ? 'Generating…' : '✨ Generate AI Summary'}
+      </Button>
+
+      {/* Error */}
+      {error && (
+        <div
+          className="rounded-xl px-4 py-3 text-[13px]"
+          style={{ background: 'rgba(239,68,68,0.08)', border: '1.5px solid rgba(239,68,68,0.25)', color: '#ef4444' }}
+        >
+          ⚠️ {error}
+        </div>
+      )}
+
+      {/* Result */}
+      {result && (
+        <div className="space-y-3">
+          {(
+            [
+              { key: 'key_decisions', label: 'Key Decisions' },
+              { key: 'action_items',  label: 'Action Items'  },
+              { key: 'next_steps',    label: 'Next Steps'    },
+            ] as { key: keyof typeof result; label: string }[]
+          ).map(({ key, label }) => (
+            <div
+              key={key}
+              className="rounded-xl px-4 py-3"
+              style={{ background: 'var(--surface-2)', border: '1.5px solid var(--border)' }}
+            >
+              <p className="text-[11px] font-bold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
+                {label}
+              </p>
+              <p className="text-[13px] whitespace-pre-wrap" style={{ color: 'var(--t1)' }}>
+                {result[key]}
+              </p>
+            </div>
+          ))}
+
+          {savedBanner ? (
+            <div
+              className="rounded-xl px-4 py-3 text-[13px] font-medium"
+              style={{ background: 'rgba(5,150,105,0.08)', border: '1.5px solid rgba(5,150,105,0.25)', color: '#059669' }}
+            >
+              ✅ Summary saved!
+            </div>
+          ) : (
+            <div className="flex gap-3">
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? 'Saving…' : 'Save Summary'}
+              </Button>
+              <Button variant="secondary" onClick={onClose}>Discard</Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!result && (
+        <Button variant="secondary" onClick={onClose}>Cancel</Button>
+      )}
+    </div>
   )
 }
 
@@ -284,87 +489,114 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
 function MeetingCard({ meeting, onDelete }: { meeting: Meeting; onDelete: () => void }) {
   const { label, variant } = dateLabel(meeting.date)
   const isPastMeeting = isPast(parseISO(`${meeting.date}T${meeting.time}`))
+  const [showSummary, setShowSummary] = useState(false)
 
   return (
-    <Card className={isPastMeeting ? 'opacity-55' : ''}>
-      <CardBody className="flex items-start gap-4 py-4">
+    <>
+      <Card className={isPastMeeting ? 'opacity-55' : ''}>
+        <CardBody className="flex items-start gap-4 py-4">
 
-        {/* Date badge */}
-        <div
-          className="w-12 h-12 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
-          style={{ background: 'rgba(0,123,255,0.08)', border: '1.5px solid rgba(0,123,255,0.16)' }}
-        >
-          <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: '#007bff' }}>
-            {format(parseISO(meeting.date), 'MMM')}
-          </span>
-          <span className="text-[18px] font-bold leading-tight" style={{ color: '#007bff' }}>
-            {format(parseISO(meeting.date), 'd')}
-          </span>
-        </div>
-
-        {/* Details */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1.5">
-            <h3 className="font-semibold text-sm" style={{ color: 'var(--t1)' }}>
-              {meeting.title}
-            </h3>
-            <Badge variant={variant}>{label}</Badge>
-            {isPastMeeting && <Badge variant="gray">Completed</Badge>}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4 text-xs" style={{ color: 'var(--t2)' }}>
-            <span className="flex items-center gap-1.5">
-              <Clock size={12} style={{ color: 'var(--t3)' }} />
-              {meeting.time}
+          {/* Date badge */}
+          <div
+            className="w-12 h-12 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
+            style={{ background: 'rgba(0,123,255,0.08)', border: '1.5px solid rgba(0,123,255,0.16)' }}
+          >
+            <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: '#007bff' }}>
+              {format(parseISO(meeting.date), 'MMM')}
             </span>
-            {/* Attendee avatars */}
-            <span className="flex items-center gap-1.5">
-              <Users size={12} style={{ color: 'var(--t3)' }} />
-              <div className="flex -space-x-1">
-                {meeting.attendees.slice(0, 4).map((a, i) => (
-                  <div
-                    key={a.id}
-                    title={a.name}
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
-                    style={{ background: avatarColor(i), boxShadow: '0 0 0 2px var(--surface)' }}
-                  >
-                    {a.name.charAt(0).toUpperCase()}
-                  </div>
-                ))}
-                {meeting.attendees.length > 4 && (
-                  <div
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold"
-                    style={{ background: 'var(--surface-2)', color: 'var(--t2)', boxShadow: '0 0 0 2px var(--surface)' }}
-                  >
-                    +{meeting.attendees.length - 4}
-                  </div>
-                )}
-              </div>
-              <span>{meeting.attendees.map(a => a.name.split(' ')[0]).join(', ')}</span>
+            <span className="text-[18px] font-bold leading-tight" style={{ color: '#007bff' }}>
+              {format(parseISO(meeting.date), 'd')}
             </span>
           </div>
 
-          {meeting.notes && (
-            <div className="mt-2 flex items-start gap-1.5">
-              <StickyNote size={11} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--t3)' }} />
-              <p className="text-xs line-clamp-2" style={{ color: 'var(--t2)' }}>{meeting.notes}</p>
+          {/* Details */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1.5">
+              <h3 className="font-semibold text-sm" style={{ color: 'var(--t1)' }}>
+                {meeting.title}
+              </h3>
+              <Badge variant={variant}>{label}</Badge>
+              {isPastMeeting && <Badge variant="gray">Completed</Badge>}
+              {meeting.summary && (
+                <Badge variant="green">Summary Saved</Badge>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Delete */}
-        <button
-          onClick={onDelete}
-          className="p-1.5 rounded-lg transition-colors flex-shrink-0"
-          style={{ color: 'var(--t3)' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#ef4444'; (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.08)' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--t3)'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-          aria-label="Delete meeting"
-        >
-          <Trash2 size={14} />
-        </button>
-      </CardBody>
-    </Card>
+            <div className="flex flex-wrap items-center gap-4 text-xs" style={{ color: 'var(--t2)' }}>
+              <span className="flex items-center gap-1.5">
+                <Clock size={12} style={{ color: 'var(--t3)' }} />
+                {meeting.time}
+              </span>
+              {/* Attendee avatars */}
+              <span className="flex items-center gap-1.5">
+                <Users size={12} style={{ color: 'var(--t3)' }} />
+                <div className="flex -space-x-1">
+                  {meeting.attendees.slice(0, 4).map((a, i) => (
+                    <div
+                      key={a.id}
+                      title={a.name}
+                      className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
+                      style={{ background: avatarColor(i), boxShadow: '0 0 0 2px var(--surface)' }}
+                    >
+                      {a.name.charAt(0).toUpperCase()}
+                    </div>
+                  ))}
+                  {meeting.attendees.length > 4 && (
+                    <div
+                      className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold"
+                      style={{ background: 'var(--surface-2)', color: 'var(--t2)', boxShadow: '0 0 0 2px var(--surface)' }}
+                    >
+                      +{meeting.attendees.length - 4}
+                    </div>
+                  )}
+                </div>
+                <span>{meeting.attendees.map(a => a.name.split(' ')[0]).join(', ')}</span>
+              </span>
+            </div>
+
+            {meeting.notes && (
+              <div className="mt-2 flex items-start gap-1.5">
+                <StickyNote size={11} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--t3)' }} />
+                <p className="text-xs line-clamp-2" style={{ color: 'var(--t2)' }}>{meeting.notes}</p>
+              </div>
+            )}
+
+            {/* Add Summary button — past meetings only */}
+            {isPastMeeting && (
+              <button
+                onClick={() => setShowSummary(true)}
+                className="mt-2.5 inline-flex items-center gap-1.5 text-[12px] font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                style={{ background: 'rgba(124,58,237,0.08)', color: '#7c3aed', border: '1.5px solid rgba(124,58,237,0.2)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(124,58,237,0.14)' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(124,58,237,0.08)' }}
+              >
+                📝 {meeting.summary ? 'View / Edit Summary' : 'Add Summary'}
+              </button>
+            )}
+          </div>
+
+          {/* Delete */}
+          <button
+            onClick={onDelete}
+            className="p-1.5 rounded-lg transition-colors flex-shrink-0"
+            style={{ color: 'var(--t3)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#ef4444'; (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.08)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--t3)'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+            aria-label="Delete meeting"
+          >
+            <Trash2 size={14} />
+          </button>
+        </CardBody>
+      </Card>
+
+      <Modal open={showSummary} title={`Meeting Summary — ${meeting.title}`} onClose={() => setShowSummary(false)}>
+        <SummaryModal
+          meeting={meeting}
+          onClose={() => setShowSummary(false)}
+          onSaved={() => setShowSummary(false)}
+        />
+      </Modal>
+    </>
   )
 }
 

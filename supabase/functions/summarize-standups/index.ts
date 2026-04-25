@@ -52,7 +52,13 @@ serve(async (req) => {
     }
 
     // Build prompt
-    const standupText = updates.map((u: any) =>
+    const standupText = updates.map((u: {
+      profiles: { full_name: string }
+      update_date: string
+      did_today: string
+      blockers?: string
+      plan_tomorrow?: string
+    }) =>
       `${u.profiles.full_name} (${u.update_date}):\n` +
       `  Did: ${u.did_today}\n` +
       `  Blockers: ${u.blockers || 'None'}\n` +

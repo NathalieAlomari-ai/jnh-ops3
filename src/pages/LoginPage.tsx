@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom'
 import { ArrowRight, Zap, Mail, Lock } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
-// ─── Inline JNH logo mark ─────────────────────────────────────────────────────
+// ─── JNH logo mark ───────────────────────────────────────────────────────────
 function JNHMark({ size = 32 }: { size?: number }) {
   return (
     <div
@@ -11,14 +11,19 @@ function JNHMark({ size = 32 }: { size?: number }) {
       style={{
         width: size,
         height: size,
-        background: 'linear-gradient(135deg, #007bff 0%, #0cc0df 100%)',
-        boxShadow: '0 4px 16px rgba(0,123,255,0.35)',
+        background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
+        boxShadow: '0 4px 20px rgba(217,119,6,0.30)',
       }}
     >
       <img
         src="/favicon.svg"
         alt="JNH Systems Logo"
-        style={{ width: size * 0.58, height: size * 0.58, filter: 'brightness(0) invert(1)', objectFit: 'contain' }}
+        style={{
+          width: size * 0.55,
+          height: size * 0.55,
+          filter: 'brightness(0) invert(1)',
+          objectFit: 'contain',
+        }}
       />
     </div>
   )
@@ -37,12 +42,12 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-[13px] font-semibold" style={{ color: 'var(--t1)' }}>
+      <label className="block text-[12.5px] font-semibold" style={{ color: 'var(--t2)' }}>
         {label}
       </label>
       <div className="relative">
         <Icon
-          size={14}
+          size={13}
           className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
           style={{ color: 'var(--t3)' }}
         />
@@ -51,9 +56,9 @@ function Field({
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm transition-all"
+          className="w-full pl-10 pr-4 py-2.5 rounded-lg text-[13px] transition-all"
           style={{
-            border: '1.5px solid var(--border)',
+            border: '1px solid var(--border)',
             background: 'var(--surface-2)',
             color: 'var(--t1)',
             fontFamily: 'var(--font-sans)',
@@ -75,8 +80,8 @@ export default function LoginPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f0f5fb' }}>
-        <div className="w-6 h-6 border-2 border-[#007bff] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+        <div className="w-5 h-5 border-2 border-[#d97706] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -104,65 +109,57 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden"
-      style={{ backgroundColor: '#f0f5fb' }}
+      style={{ backgroundColor: 'var(--bg)' }}
     >
-      {/* ── Background blobs ── */}
+      {/* ── Background blobs — warm amber tones ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute rounded-full"
           style={{
             width: 600, height: 600,
-            top: -180, right: -120,
-            background: 'radial-gradient(circle, rgba(0,123,255,0.10) 0%, transparent 70%)',
+            top: -200, right: -140,
+            background: 'radial-gradient(circle, rgba(217,119,6,0.07) 0%, transparent 70%)',
           }}
         />
         <div
           className="absolute rounded-full"
           style={{
             width: 500, height: 500,
-            bottom: -150, left: -100,
-            background: 'radial-gradient(circle, rgba(12,192,223,0.09) 0%, transparent 70%)',
-          }}
-        />
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: 300, height: 300,
-            top: '40%', left: '40%',
-            background: 'radial-gradient(circle, rgba(43,112,228,0.06) 0%, transparent 70%)',
+            bottom: -160, left: -100,
+            background: 'radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%)',
           }}
         />
       </div>
 
       {/* ── Card ── */}
       <div
-        className="relative w-full max-w-[420px]"
+        className="relative w-full max-w-[400px]"
         style={{
           background: 'var(--surface)',
           border: '1px solid var(--border)',
-          borderRadius: 20,
-          boxShadow: '0 8px 48px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06)',
+          borderRadius: 16,
+          boxShadow: '0 8px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
         }}
       >
-        {/* Top accent bar */}
+        {/* Orange accent bar */}
         <div
-          className="h-1 w-full rounded-t-[20px]"
-          style={{ background: 'linear-gradient(90deg, #007bff 0%, #0cc0df 100%)' }}
+          className="h-[3px] w-full rounded-t-[16px]"
+          style={{ background: 'linear-gradient(90deg, #d97706 0%, #f59e0b 100%)' }}
         />
 
         <div className="px-8 pt-8 pb-9 space-y-6">
 
           {/* ── Brand ── */}
-          <div className="flex flex-col items-center gap-3 pb-2">
-            <JNHMark size={48} />
+          <div className="flex flex-col items-center gap-3 pb-1">
+            <JNHMark size={46} />
             <div className="text-center">
               <h1
-                className="text-[22px] font-bold tracking-tight"
+                className="text-[21px] font-bold tracking-tight"
                 style={{ color: 'var(--t1)', fontFamily: 'var(--font-display)' }}
               >
                 JNH Systems
               </h1>
-              <p className="text-[13px] mt-0.5 font-medium" style={{ color: 'var(--t3)' }}>
+              <p className="text-[12.5px] mt-0.5 font-medium" style={{ color: 'var(--t3)' }}>
                 Internal Ops Platform
               </p>
             </div>
@@ -174,12 +171,12 @@ export default function LoginPage() {
           {/* ── Heading ── */}
           <div>
             <h2
-              className="text-[18px] font-bold"
+              className="text-[16px] font-semibold"
               style={{ color: 'var(--t1)', fontFamily: 'var(--font-display)' }}
             >
               Sign in to your account
             </h2>
-            <p className="text-[13px] mt-1" style={{ color: 'var(--t2)' }}>
+            <p className="text-[12.5px] mt-1" style={{ color: 'var(--t3)' }}>
               Welcome back — enter your credentials below.
             </p>
           </div>
@@ -195,7 +192,7 @@ export default function LoginPage() {
           {/* ── Alerts ── */}
           {error && (
             <div
-              className="px-4 py-3 rounded-xl text-[13px] font-medium flex items-start gap-2"
+              className="px-4 py-3 rounded-lg text-[12.5px] font-medium flex items-start gap-2"
               style={{ background: '#fff5f5', border: '1px solid #fecaca', color: '#b91c1c' }}
             >
               <span className="mt-0.5 flex-shrink-0">⚠</span>
@@ -204,7 +201,7 @@ export default function LoginPage() {
           )}
           {message && (
             <div
-              className="px-4 py-3 rounded-xl text-[13px] font-medium flex items-start gap-2"
+              className="px-4 py-3 rounded-lg text-[12.5px] font-medium flex items-start gap-2"
               style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#15803d' }}
             >
               <span className="mt-0.5 flex-shrink-0">✓</span>
@@ -219,7 +216,7 @@ export default function LoginPage() {
             <button
               onClick={handleSignIn}
               disabled={pending}
-              className="w-full py-3 rounded-xl font-bold text-white text-[14px] flex items-center justify-center gap-2 transition-all btn-brand"
+              className="w-full py-2.5 rounded-lg font-semibold text-white text-[13.5px] flex items-center justify-center gap-2 transition-all btn-brand cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {pending ? (
                 <span className="flex items-center gap-2">
@@ -227,7 +224,7 @@ export default function LoginPage() {
                   Signing in…
                 </span>
               ) : (
-                <>Sign In <ArrowRight size={15} /></>
+                <>Sign In <ArrowRight size={14} /></>
               )}
             </button>
 
@@ -244,17 +241,17 @@ export default function LoginPage() {
             <button
               onClick={handleMagicLink}
               disabled={pending}
-              className="w-full py-3 rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 transition-all"
+              className="w-full py-2.5 rounded-lg font-medium text-[13px] flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 background: 'var(--surface-2)',
-                border: '1.5px solid var(--border)',
+                border: '1px solid var(--border)',
                 color: 'var(--t2)',
               }}
               onMouseEnter={e => {
                 const el = e.currentTarget
-                el.style.borderColor = 'var(--blue)'
-                el.style.color = 'var(--blue)'
-                el.style.background = 'rgba(0,123,255,0.04)'
+                el.style.borderColor = 'var(--orange)'
+                el.style.color = 'var(--orange)'
+                el.style.background = 'rgba(217,119,6,0.04)'
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget
@@ -263,13 +260,13 @@ export default function LoginPage() {
                 el.style.background = 'var(--surface-2)'
               }}
             >
-              <Zap size={14} />
+              <Zap size={13} />
               Send Magic Link
             </button>
           </div>
 
           {/* Footer */}
-          <p className="text-center text-[12px]" style={{ color: 'var(--t3)' }}>
+          <p className="text-center text-[11.5px]" style={{ color: 'var(--t3)' }}>
             Restricted to JNH Systems team members
           </p>
         </div>

@@ -148,7 +148,13 @@ serve(async (req) => {
     // ── 6. Build context text blocks
     const standupText = standups.length === 0
       ? 'No standups submitted this week.'
-      : standups.map((u: any) =>
+      : standups.map((u: {
+          profiles?: { full_name?: string }
+          update_date: string
+          did_today: string
+          blockers?: string
+          plan_tomorrow?: string
+        }) =>
           `• ${u.profiles?.full_name ?? 'Unknown'} (${u.update_date})\n` +
           `  Did:      ${u.did_today}\n` +
           `  Blockers: ${u.blockers || 'None'}\n` +
@@ -157,13 +163,23 @@ serve(async (req) => {
 
     const tasksText = tasks.length === 0
       ? 'No active tasks this week.'
-      : tasks.map((t: any) =>
+      : tasks.map((t: {
+          priority: string
+          title: string
+          status: string
+          profiles?: { full_name?: string }
+        }) =>
           `• [${t.priority.toUpperCase()}] ${t.title} — ${t.status} (${t.profiles?.full_name ?? 'Unassigned'})`
         ).join('\n')
 
     const initiativesText = initiatives.length === 0
       ? 'No active initiatives.'
-      : initiatives.map((i: any) =>
+      : initiatives.map((i: {
+          name: string
+          status: string
+          profiles?: { full_name?: string }
+          target_date?: string
+        }) =>
           `• ${i.name} [${i.status}] — Owner: ${i.profiles?.full_name ?? 'Unknown'}` +
           (i.target_date ? ` | Target: ${i.target_date}` : '')
         ).join('\n')
@@ -242,7 +258,7 @@ serve(async (req) => {
       for (const key of required) {
         if (typeof reportContent[key] !== 'string') throw new Error(`Missing key: ${key}`)
       }
-    } catch (parseErr) {
+    } catch {
       // Fallback: store raw text in standup_digest so nothing is lost
       reportContent = {
         standup_digest: rawText,

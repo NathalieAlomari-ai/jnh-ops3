@@ -14,6 +14,7 @@ interface AuthContextValue {
   signOut: () => Promise<void>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -22,48 +23,61 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase
+  // Fetch profile whenever the user id changes.
+  // IMPORTANT: this runs OUTSIDE the onAuthStateChange callback. Calling supabase
+  // inside that callback deadlocks the auth client (known supabase-js issue).
+  useEffect(() => {
+    if (!user) {
+      setProfile(null)
+      return
+    }
+    let cancelled = false
+    supabase
       .from('profiles')
       .select('*')
-      .eq('id', userId)
+      .eq('id', user.id)
       .single()
-    setProfile(data ?? null)
-  }
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) console.error('[auth] failed to load profile:', error)
+        setProfile((data as Profile | null) ?? null)
+      })
+    return () => { cancelled = true }
+  }, [user?.id])
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      // 1. جلب الجلسة الحالية
-      const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      setUser(session?.user ?? null)
+    let mounted = true
 
-      // 2. لو فيه مستخدم، جيب بياناته
-      if (session?.user) {
-        await fetchProfile(session.user.id)
-      }
-      // 3. قفل علامة التحميل فوراً
+    // Fallback: if Supabase never fires, unblock after 5s
+    const timeout = setTimeout(() => {
+      if (mounted) setLoading(false)
+    }, 5000)
+
+    // Hydrate initial session without depending on the auth-state event.
+    supabase.auth.getSession().then(({ data: { session: initial } }) => {
+      if (!mounted) return
+      setSession(initial)
+      setUser(initial?.user ?? null)
+      clearTimeout(timeout)
       setLoading(false)
-    }
+    })
 
-    initializeAuth()
-
+    // Subsequent auth changes (sign-in, sign-out, token refresh).
+    // Keep this callback SYNCHRONOUS — do NOT await supabase calls here.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        // لو حصل أي تغيير (دخول أو خروج)، حدث البيانات واقفل التحميل
-        setSession(session)
-        setUser(session?.user ?? null)
-
-        if (session?.user) {
-          await fetchProfile(session.user.id)
-        } else {
-          setProfile(null)
-        }
-        setLoading(false) // دي الضمان إن الشاشة متفضلش معلقة
+      (_event, newSession) => {
+        if (!mounted) return
+        setSession(newSession)
+        setUser(newSession?.user ?? null)
+        setLoading(false)
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      clearTimeout(timeout)
+      subscription.unsubscribe()
+    }
   }, [])
 
   const isAdmin = profile?.role === 'admin'

@@ -1,59 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Onest:wght@600;700;800;900&display=swap');
 
 /* ── Tailwind v4 dark mode ───────────────────────────────────── */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ── Register custom fonts ───────────────────────────────────── */
 @theme {
-  --font-sans:    'DM Sans', system-ui, sans-serif;
-  --font-display: 'Onest', system-ui, sans-serif;
+  --font-sans:    'Inter', 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Inter', system-ui, sans-serif;
 }
 
-/* ── JNH Brand Tokens ────────────────────────────────────────── */
+/* ── Claude Design Tokens ────────────────────────────────────── */
 :root {
-  /* Brand */
-  --blue:            #007bff;
-  --blue-hover:      #0069d9;
-  --cyan:            #0cc0df;
-  --cyan-hover:      #0aaecb;
-  --deep-blue:       #2b70e4;
+  /* Brand — Claude orange */
+  --orange:          #d97706;
+  --orange-hover:    #b45309;
+  --orange-light:    #f59e0b;
+  --orange-dim:      rgba(217,119,6,0.12);
 
   /* Gradient */
-  --g-brand:         linear-gradient(135deg, #007bff 0%, #0cc0df 100%);
-  --g-brand-hover:   linear-gradient(135deg, #0069d9 0%, #0aaecb 100%);
+  --g-brand:         linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  --g-brand-hover:   linear-gradient(135deg, #b45309 0%, #d97706 100%);
 
-  /* Sidebar */
-  --sb-bg:           #1f1f1f;
-  --sb-hover:        rgba(255,255,255,0.055);
-  --sb-active-bg:    rgba(0,123,255,0.14);
-  --sb-active-bar:   #007bff;
-  --sb-text:         #858585;
-  --sb-text-active:  #f0f0f0;
-  --sb-label:        rgba(255,255,255,0.22);
+  /* Sidebar — Claude dark charcoal */
+  --sb-bg:           #1a1a1a;
+  --sb-hover:        rgba(255,255,255,0.05);
+  --sb-active-bg:    rgba(217,119,6,0.10);
+  --sb-active-bar:   #d97706;
+  --sb-text:         #8a8a8a;
+  --sb-text-active:  #f0ece4;
+  --sb-label:        rgba(255,255,255,0.20);
   --sb-divider:      rgba(255,255,255,0.07);
 
-  /* Page */
-  --bg:              #f4f6f9;
+  /* Page — Claude warm off-white */
+  --bg:              #faf9f7;
   --surface:         #ffffff;
-  --surface-2:       #f9fafc;
-  --border:          #e5e9f0;
-  --border-strong:   #d3d9e4;
+  --surface-2:       #f5f4f1;
+  --border:          #e9e7e3;
+  --border-strong:   #d5d3ce;
 
   /* Text */
-  --t1:              #111827;
-  --t2:              #4b5568;
-  --t3:              #9ca3af;
+  --t1:              #1a1a1a;
+  --t2:              #5a5a5a;
+  --t3:              #a0a0a0;
 
   /* Shadows */
-  --shadow-xs:       0 1px 2px rgba(0,0,0,0.05);
-  --shadow-sm:       0 1px 4px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md:       0 4px 16px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
-  --shadow-blue:     0 4px 16px rgba(0,123,255,0.28);
-  --shadow-blue-lg:  0 8px 28px rgba(0,123,255,0.30);
+  --shadow-xs:       0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm:       0 1px 4px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-md:       0 4px 16px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.03);
+  --shadow-orange:   0 4px 16px rgba(217,119,6,0.22);
+  --shadow-orange-lg: 0 8px 28px rgba(217,119,6,0.28);
 
   /* Ring */
-  --ring:            rgba(0,123,255,0.25);
+  --ring:            rgba(217,119,6,0.30);
 }
 
 /* ── Reset ───────────────────────────────────────────────────── */
@@ -69,7 +68,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--bg);
   color: var(--t1);
-  letter-spacing: -0.008em;
+  letter-spacing: -0.006em;
   line-height: 1.6;
 }
 
@@ -77,7 +76,7 @@ body {
 
 h1, h2, h3, .display {
   font-family: var(--font-display);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.022em;
   line-height: 1.2;
 }
 
@@ -85,17 +84,17 @@ h1, h2, h3, .display {
 .btn-brand {
   background: var(--g-brand);
   color: #fff;
-  box-shadow: var(--shadow-blue);
+  box-shadow: var(--shadow-orange);
   border: none;
 }
 .btn-brand:hover:not(:disabled) {
   background: var(--g-brand-hover);
-  box-shadow: var(--shadow-blue-lg);
+  box-shadow: var(--shadow-orange-lg);
   transform: translateY(-1px);
 }
 .btn-brand:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: var(--shadow-blue);
+  box-shadow: var(--shadow-orange);
 }
 .btn-brand:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -103,7 +102,7 @@ h1, h2, h3, .display {
 input:focus, textarea:focus, select:focus {
   outline: none;
   box-shadow: 0 0 0 3px var(--ring);
-  border-color: var(--blue) !important;
+  border-color: var(--orange) !important;
 }
 
 input, textarea, select {
@@ -114,11 +113,11 @@ input, textarea, select {
 /* ── Scrollbar ───────────────────────────────────────────────── */
 ::-webkit-scrollbar          { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track    { background: transparent; }
-::-webkit-scrollbar-thumb    { background: #d1d5db; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+::-webkit-scrollbar-thumb    { background: #d5d3ce; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
 
 /* ── Selection ───────────────────────────────────────────────── */
-::selection { background: rgba(0,123,255,0.14); color: #00408a; }
+::selection { background: rgba(217,119,6,0.14); color: #7c3a00; }
 
 /* ════════════════════════════════════════════════════════════════
    DARK MODE — complete token overrides
@@ -126,37 +125,37 @@ input, textarea, select {
 .dark {
   color-scheme: dark;
 
-  /* Page layers */
-  --bg:              #0d1117;
-  --surface:         #161b22;
-  --surface-2:       #1c2432;
-  --border:          rgba(255, 255, 255, 0.07);
-  --border-strong:   rgba(255, 255, 255, 0.13);
+  /* Page layers — Claude dark */
+  --bg:              #1a1a1a;
+  --surface:         #262626;
+  --surface-2:       #2e2e2e;
+  --border:          rgba(255, 255, 255, 0.08);
+  --border-strong:   rgba(255, 255, 255, 0.14);
 
   /* Text */
-  --t1:    #e6edf3;
-  --t2:    #7d8590;
-  --t3:    #484f58;
+  --t1:    #ece9e1;
+  --t2:    #8a8a8a;
+  --t3:    #555555;
 
-  /* Sidebar — slightly deeper for contrast */
-  --sb-bg:          #0d1117;
+  /* Sidebar — darker variant in dark mode */
+  --sb-bg:          #111111;
   --sb-hover:       rgba(255,255,255,0.05);
-  --sb-active-bg:   rgba(0,123,255,0.18);
-  --sb-active-bar:  #007bff;
-  --sb-text:        #636e7b;
-  --sb-text-active: #e6edf3;
-  --sb-label:       rgba(255,255,255,0.20);
+  --sb-active-bg:   rgba(217,119,6,0.14);
+  --sb-active-bar:  #d97706;
+  --sb-text:        #666666;
+  --sb-text-active: #ece9e1;
+  --sb-label:       rgba(255,255,255,0.18);
   --sb-divider:     rgba(255,255,255,0.06);
 
-  /* Shadows — deeper on dark backgrounds */
+  /* Shadows — deeper on dark */
   --shadow-xs:        0 1px 2px rgba(0,0,0,0.60);
   --shadow-sm:        0 1px 4px rgba(0,0,0,0.50), 0 1px 2px rgba(0,0,0,0.40);
   --shadow-md:        0 4px 16px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.40);
-  --shadow-blue:      0 4px 20px rgba(0,123,255,0.45);
-  --shadow-blue-lg:   0 8px 32px rgba(0,123,255,0.50);
+  --shadow-orange:    0 4px 20px rgba(217,119,6,0.35);
+  --shadow-orange-lg: 0 8px 32px rgba(217,119,6,0.40);
 
-  /* Focus ring — brighter on dark */
-  --ring: rgba(0,123,255,0.40);
+  /* Focus ring */
+  --ring: rgba(217,119,6,0.35);
 }
 
 /* ── Dark: body ────────────────────────────────────────────────── */
@@ -186,9 +185,9 @@ input, textarea, select {
 
 /* Text */
 .dark .text-gray-900, .dark .text-slate-900 { color: var(--t1) !important; }
-.dark .text-gray-700, .dark .text-slate-700 { color: #c9d1d9 !important; }
+.dark .text-gray-700, .dark .text-slate-700 { color: #d4cfc6 !important; }
 .dark .text-gray-600, .dark .text-slate-600 { color: var(--t2) !important; }
-.dark .text-gray-500, .dark .text-slate-500 { color: #6e7681 !important; }
+.dark .text-gray-500, .dark .text-slate-500 { color: #777777 !important; }
 .dark .text-gray-400, .dark .text-slate-400 { color: var(--t3) !important; }
 
 /* Borders */
@@ -201,17 +200,17 @@ input, textarea, select {
 .dark [style*="border-b"] { border-color: var(--border) !important; }
 
 /* Avatars / colored chips — keep vibrant on dark */
-.dark .bg-blue-50  { background-color: rgba(0,123,255,0.12) !important; }
+.dark .bg-blue-50  { background-color: rgba(99,102,241,0.12) !important; }
 .dark .bg-emerald-50 { background-color: rgba(5,150,105,0.12) !important; }
-.dark .bg-orange-50  { background-color: rgba(234,88,12,0.12) !important; }
+.dark .bg-orange-50  { background-color: rgba(217,119,6,0.12) !important; }
 
 /* Scrollbar on dark */
-.dark ::-webkit-scrollbar-thumb { background: #30363d; }
-.dark ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+.dark ::-webkit-scrollbar-thumb { background: #383838; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #555555; }
 
 /* Selection on dark */
-.dark ::selection { background: rgba(0,123,255,0.30); color: #b3d4ff; }
+.dark ::selection { background: rgba(217,119,6,0.28); color: #f5e0b8; }
 
-/* ── Dark: form labels (Tailwind utility classes used across pages) */
-.dark .text-slate-700 { color: #c9d1d9 !important; }
+/* ── Dark: form labels */
+.dark .text-slate-700 { color: #d4cfc6 !important; }
 .dark label { color: var(--t2) !important; }

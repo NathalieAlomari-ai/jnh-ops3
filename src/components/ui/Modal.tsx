@@ -34,7 +34,7 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
       {/* Backdrop */}
       <div
         className="absolute inset-0"
-        style={{ background: 'rgba(10,14,26,0.50)', backdropFilter: 'blur(3px)' }}
+        style={{ background: 'rgba(10,10,10,0.55)', backdropFilter: 'blur(4px)' }}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -45,14 +45,14 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
         style={{
           background: 'var(--surface)',
           border: '1px solid var(--border)',
-          borderRadius: 18,
-          boxShadow: '0 24px 64px rgba(0,0,0,0.16), 0 4px 16px rgba(0,0,0,0.08)',
+          borderRadius: 14,
+          boxShadow: '0 24px 64px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.06)',
         }}
       >
-        {/* Accent line */}
+        {/* Claude orange accent line */}
         <div
-          className="h-0.5 w-full rounded-t-[18px]"
-          style={{ background: 'linear-gradient(90deg, #007bff 0%, #0cc0df 100%)' }}
+          className="h-[3px] w-full rounded-t-[14px]"
+          style={{ background: 'linear-gradient(90deg, #d97706 0%, #f59e0b 100%)' }}
         />
 
         {/* Header */}
@@ -61,7 +61,7 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
           style={{ borderBottom: '1px solid var(--border)' }}
         >
           <h2
-            className="text-[15px] font-bold"
+            className="text-[15px] font-semibold"
             style={{ color: 'var(--t1)', fontFamily: 'var(--font-display)', letterSpacing: '-0.02em' }}
           >
             {title}
@@ -70,12 +70,18 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
             ref={closeRef}
             onClick={onClose}
             aria-label="Close dialog"
-            className="p-1.5 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#007bff]"
+            className="p-1.5 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--orange)] cursor-pointer"
             style={{ color: 'var(--t3)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--bg)'; (e.currentTarget as HTMLElement).style.color = 'var(--t1)' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--t3)' }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.background = 'var(--surface-2)'
+              ;(e.currentTarget as HTMLElement).style.color = 'var(--t1)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.background = 'transparent'
+              ;(e.currentTarget as HTMLElement).style.color = 'var(--t3)'
+            }}
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
 

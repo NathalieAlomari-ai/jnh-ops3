@@ -72,7 +72,7 @@ function ReportContent({ text }: { text: string }) {
             className={isBullet ? 'flex gap-2' : ''}
             dangerouslySetInnerHTML={{
               __html: isBullet
-                ? `<span class="text-slate-400 flex-shrink-0">•</span><span>${parsed.replace(/^[\s•\-]+/, '')}</span>`
+                ? `<span class="text-slate-400 flex-shrink-0">•</span><span>${parsed.replace(/^[\s•-]+/, '')}</span>`
                 : parsed,
             }}
           />
@@ -92,10 +92,10 @@ function WeeklyStandupBreakdown({
 }) {
   const { data: updates, isLoading } = useDailyUpdates(weekStart, weekEnd)
   const { data: profiles } = useProfiles()
-  const profileColorIndex = new Map(profiles?.map((p, i) => [p.id, i]) ?? [])
 
   // Group updates by user
   const byMember = useMemo(() => {
+    const profileColorIndex = new Map(profiles?.map((p, i) => [p.id, i]) ?? [])
     const map = new Map<string, { name: string; colorIdx: number; updates: typeof updates }>()
     for (const u of updates ?? []) {
       if (!map.has(u.user_id)) {

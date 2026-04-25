@@ -126,7 +126,7 @@ serve(async (req) => {
     if (mode === 'unified') {
       // All users
       const { data: profiles } = await supabase.from('profiles').select('id')
-      targetUserIds = (profiles ?? []).map((p: any) => p.id)
+      targetUserIds = (profiles ?? []).map((p: { id: string }) => p.id)
     } else if (body.user_id && isAdmin) {
       // Admin requesting a specific user
       targetUserIds = [body.user_id]
@@ -204,7 +204,7 @@ serve(async (req) => {
 
     if (profiles.length > 0) {
       contextText += `--- TEAM MEMBERS IN SCOPE ---\n`
-      contextText += profiles.map((p: any) =>
+      contextText += profiles.map((p: { full_name: string; job_title?: string; department?: string }) =>
         `• ${p.full_name}${p.job_title ? ` (${p.job_title})` : ''}${p.department ? ` — ${p.department}` : ''}`
       ).join('\n') + '\n\n'
     }
@@ -213,7 +213,14 @@ serve(async (req) => {
       contextText += `--- DAILY STANDUPS ---\nNo standups submitted this month.\n\n`
     } else {
       contextText += `--- DAILY STANDUPS (${standups.length} entries) ---\n`
-      contextText += standups.map((u: any) => {
+      contextText += standups.map((u: {
+        profiles?: { full_name?: string }
+        update_date: string
+        contribution_tags?: string[]
+        did_today: string
+        blockers?: string
+        plan_tomorrow?: string
+      }) => {
         const tagsStr = u.contribution_tags?.length
           ? ` [Tags: ${u.contribution_tags.join(', ')}]`
           : ''
@@ -230,7 +237,14 @@ serve(async (req) => {
       contextText += `--- TASKS ---\nNo tasks this month.\n\n`
     } else {
       contextText += `--- TASKS (${tasks.length} total) ---\n`
-      contextText += tasks.map((t: any) => {
+      contextText += tasks.map((t: {
+        priority: string
+        title: string
+        status: string
+        profiles?: { full_name?: string }
+        contribution_tags?: string[]
+        description?: string
+      }) => {
         const tagsStr = t.contribution_tags?.length
           ? ` [Tags: ${t.contribution_tags.join(', ')}]`
           : ''
@@ -296,7 +310,7 @@ serve(async (req) => {
       if (!reportContent.executive_summary || !Array.isArray(reportContent.sections)) {
         throw new Error('Invalid report structure')
       }
-    } catch (_parseErr) {
+    } catch {
       reportContent = {
         month: label,
         executive_summary: 'Report generated — see raw output below.',
@@ -309,7 +323,7 @@ serve(async (req) => {
     const { error: updateErr } = await supabase
       .from('ai_summaries')
       .update({
-        report_content: reportContent as any,
+        report_content: reportContent as unknown as Record<string, unknown>,
         content: reportContent.executive_summary,
         status: 'done',
       })

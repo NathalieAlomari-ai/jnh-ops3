@@ -178,7 +178,7 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
 
     // Phase 1: save the meeting
     setSaving(true)
-    const meeting = addMeeting({ title: autoTitle, date, time, attendees, notes })
+    const meeting = addMeeting({ title: autoTitle, date, time, attendees, notes, summary: null })
     setSaving(false)
 
     // n8n webhook — fire and forget (unchanged)

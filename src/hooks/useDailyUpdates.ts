@@ -24,9 +24,11 @@ export function useCreateDailyUpdate() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (values: Omit<DailyUpdate, 'id' | 'created_at' | 'updated_at'>) => {
+      // Strip contribution_tags — column may not exist in all environments
+      const { contribution_tags: _tags, ...payload } = values
       const { data, error } = await supabase
         .from('daily_updates')
-        .upsert(values, { onConflict: 'user_id,update_date' })
+        .upsert(payload, { onConflict: 'user_id,update_date' })
         .select()
         .single()
       if (error) throw error

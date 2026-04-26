@@ -11,8 +11,8 @@ function JNHMark({ size = 32 }: { size?: number }) {
       style={{
         width: size,
         height: size,
-        background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
-        boxShadow: '0 4px 20px rgba(217,119,6,0.30)',
+        background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
+        boxShadow: '0 4px 20px rgba(37,99,235,0.30)',
       }}
     >
       <img
@@ -81,7 +81,7 @@ export default function LoginPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
-        <div className="w-5 h-5 border-2 border-[#d97706] border-t-transparent rounded-full animate-spin" />
+        <div className="w-5 h-5 border-2 border-[#2563eb] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -111,14 +111,14 @@ export default function LoginPage() {
       className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden"
       style={{ backgroundColor: 'var(--bg)' }}
     >
-      {/* ── Background blobs — warm amber tones ── */}
+      {/* ── Background blobs — navy blue tones ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute rounded-full"
           style={{
             width: 600, height: 600,
             top: -200, right: -140,
-            background: 'radial-gradient(circle, rgba(217,119,6,0.07) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%)',
           }}
         />
         <div
@@ -126,7 +126,7 @@ export default function LoginPage() {
           style={{
             width: 500, height: 500,
             bottom: -160, left: -100,
-            background: 'radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%)',
           }}
         />
       </div>
@@ -141,10 +141,10 @@ export default function LoginPage() {
           boxShadow: '0 8px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
         }}
       >
-        {/* Orange accent bar */}
+        {/* Blue accent bar */}
         <div
           className="h-[3px] w-full rounded-t-[16px]"
-          style={{ background: 'linear-gradient(90deg, #d97706 0%, #f59e0b 100%)' }}
+          style={{ background: 'linear-gradient(90deg, #1d4ed8 0%, #3b82f6 100%)' }}
         />
 
         <div className="px-8 pt-8 pb-9 space-y-6">
@@ -251,7 +251,7 @@ export default function LoginPage() {
                 const el = e.currentTarget
                 el.style.borderColor = 'var(--orange)'
                 el.style.color = 'var(--orange)'
-                el.style.background = 'rgba(217,119,6,0.04)'
+                el.style.background = 'rgba(37,99,235,0.04)'
               }}
               onMouseLeave={e => {
                 const el = e.currentTarget

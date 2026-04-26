@@ -49,10 +49,10 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
           boxShadow: '0 24px 64px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.06)',
         }}
       >
-        {/* Claude orange accent line */}
+        {/* JNH blue accent line */}
         <div
           className="h-[3px] w-full rounded-t-[14px]"
-          style={{ background: 'linear-gradient(90deg, #d97706 0%, #f59e0b 100%)' }}
+          style={{ background: 'linear-gradient(90deg, #1d4ed8 0%, #3b82f6 100%)' }}
         />
 
         {/* Header */}

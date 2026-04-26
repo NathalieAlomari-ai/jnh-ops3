@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, ClipboardList, FileText, Briefcase,
   SquareKanban, GitMerge, Users, ShieldCheck, LogOut,
-  Sun, Moon, CalendarDays, BarChart3,
+  Sun, Moon, CalendarDays, BarChart3, FolderOpen,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -13,7 +13,7 @@ function LogoMark() {
     <div className="flex items-center gap-2.5">
       <div
         className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center"
-        style={{ background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)' }}
       >
         <img
           src="/favicon.svg"
@@ -55,7 +55,7 @@ function NavItem({ to, label, icon: Icon }: { to: string; label: string; icon: R
         'group flex items-center gap-2.5 py-[8px] pr-3 rounded-r-md text-[13px] font-medium',
         'transition-colors duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-white/20',
         'pl-[calc(0.75rem-2px)]',
-        !isActive && 'hover:bg-[var(--sb-hover)] hover:text-[#d4cfc6]',
+        !isActive && 'hover:bg-[var(--sb-hover)] hover:text-[#cbd5e1]',
       ].filter(Boolean).join(' ')}
     >
       {({ isActive }) => (
@@ -64,7 +64,7 @@ function NavItem({ to, label, icon: Icon }: { to: string; label: string; icon: R
             size={14}
             strokeWidth={isActive ? 2.2 : 1.8}
             className="flex-shrink-0 transition-colors"
-            style={{ color: isActive ? '#d97706' : 'currentColor' }}
+            style={{ color: isActive ? '#2563eb' : 'currentColor' }}
           />
           <span className="truncate">{label}</span>
         </>
@@ -112,6 +112,7 @@ export default function Sidebar() {
         <NavItem to="/meetings"       label="Meeting Schedule" icon={CalendarDays}    />
         <NavItem to="/weekly-summary"  label="Weekly Summary"   icon={FileText}        />
         <NavItem to="/monthly-report" label="Monthly Report"   icon={BarChart3}       />
+        <NavItem to="/documents"      label="Documents"        icon={FolderOpen}      />
 
         <SectionLabel label="Operations" />
         <NavItem to="/projects" label="Projects"   icon={Briefcase}    />
@@ -137,7 +138,7 @@ export default function Sidebar() {
           style={{ color: 'var(--sb-text)' }}
           onMouseEnter={e => {
             (e.currentTarget as HTMLElement).style.background = 'var(--sb-hover)'
-            ;(e.currentTarget as HTMLElement).style.color = '#d4cfc6'
+            ;(e.currentTarget as HTMLElement).style.color = '#cbd5e1'
           }}
           onMouseLeave={e => {
             (e.currentTarget as HTMLElement).style.background = 'transparent'
@@ -152,7 +153,7 @@ export default function Sidebar() {
           {/* toggle pill */}
           <div
             className="relative w-7 h-3.5 rounded-full flex-shrink-0 transition-colors"
-            style={{ background: theme === 'dark' ? '#d97706' : '#444444' }}
+            style={{ background: theme === 'dark' ? '#3b82f6' : '#2563eb' }}
           >
             <div
               className="absolute top-0.5 w-2.5 h-2.5 bg-white rounded-full shadow-sm transition-all duration-200"
@@ -168,7 +169,7 @@ export default function Sidebar() {
         >
           <div
             className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[11px] font-bold"
-            style={{ background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' }}
+            style={{ background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)' }}
           >
             {initials}
           </div>

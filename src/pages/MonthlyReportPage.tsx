@@ -2,17 +2,18 @@ import { useState } from 'react'
 import {
   Sparkles, ChevronDown, BarChart3, Lightbulb, Megaphone,
   Users, Building2, AppWindow, Handshake, PackageCheck, Loader2,
-  FileText, RefreshCw, AlertCircle,
+  FileText, RefreshCw, AlertCircle, Download, Mail,
 } from 'lucide-react'
 import { useGenerateMonthlyReport } from '@/hooks/useMonthlyReport'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfiles } from '@/hooks/useProfiles'
 import { Card, CardBody } from '@/components/ui/Card'
+import { triggerWebhook } from '@/lib/webhook'
 import type { MonthlyReport, MonthlyTagSection } from '@/types/database'
 
 // ─── Tag metadata ─────────────────────────────────────────────────────────────
 const TAG_META: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
-  Ideas:        { icon: Lightbulb,    color: '#f59e0b', bg: 'rgba(245,158,11,0.10)' },
+  Ideas:        { icon: Lightbulb,    color: '#2563eb', bg: 'rgba(37,99,235,0.10)' },
   Outreach:     { icon: Megaphone,    color: '#0cc0df', bg: 'rgba(12,192,223,0.10)' },
   Meetings:     { icon: Users,        color: '#8b5cf6', bg: 'rgba(139,92,246,0.10)' },
   Entities:     { icon: Building2,    color: '#ef4444', bg: 'rgba(239,68,68,0.10)'  },
@@ -180,6 +181,71 @@ export default function MonthlyReportPage() {
   const [targetUserId, setTargetUserId] = useState<string>('')
   const [report, setReport] = useState<MonthlyReport | null>(null)
   const [cached, setCached] = useState(false)
+  const [emailStatus, setEmailStatus] = useState<{ ok: boolean; message: string } | null>(null)
+  const [emailSending, setEmailSending] = useState(false)
+
+  function buildReportText(r: MonthlyReport): string {
+    const lines: string[] = [
+      `JNH SYSTEMS — MONTHLY REPORT`,
+      `${r.month}`,
+      ``,
+      `EXECUTIVE SUMMARY`,
+      r.executive_summary,
+      ``,
+    ]
+    r.sections.forEach(s => {
+      lines.push(`── ${s.tag.toUpperCase()} ──`)
+      lines.push(s.summary)
+      if (s.highlights?.length) {
+        s.highlights.forEach(h => lines.push(`  • ${h}`))
+      }
+      lines.push(``)
+    })
+    if (r.overall_impact) {
+      lines.push(`OVERALL IMPACT`)
+      lines.push(r.overall_impact)
+    }
+    return lines.join('\n')
+  }
+
+  function handleDownload() {
+    if (!report) return
+    const text = buildReportText(report)
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `JNH_Report_${selectedMonth}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function handleEmail() {
+    if (!report || !profile) return
+    setEmailSending(true)
+    setEmailStatus(null)
+    try {
+      await triggerWebhook({
+        event: 'report.generated',
+        report: {
+          month: report.month ?? selectedMonthLabel,
+          mode,
+          executive_summary: report.executive_summary,
+          overall_impact: report.overall_impact,
+          sections: report.sections,
+        },
+        recipient: {
+          id: profile.id,
+          name: profile.full_name,
+        },
+      })
+      setEmailStatus({ ok: true, message: 'Report sent to your email via n8n.' })
+    } catch (err) {
+      setEmailStatus({ ok: false, message: (err as Error).message ?? 'Failed to send email.' })
+    } finally {
+      setEmailSending(false)
+    }
+  }
 
   async function handleGenerate() {
     const params: Parameters<typeof generate.mutateAsync>[0] = {
@@ -205,7 +271,7 @@ export default function MonthlyReportPage() {
             Monthly Report
           </h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--t3)' }}>
-            AI-generated contribution summary grouped by the JNH Contribution Tags
+            Generated from your daily standups and tasks for the selected month
           </p>
         </div>
       </div>
@@ -347,27 +413,66 @@ export default function MonthlyReportPage() {
       {/* Report */}
       {report && !generate.isPending && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2
-              className="text-lg font-bold"
-              style={{ color: 'var(--t1)', fontFamily: 'var(--font-display)' }}
-            >
-              {report.month ?? selectedMonthLabel}
-              {mode === 'unified' && (
-                <span
-                  className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full"
-                  style={{ background: 'rgba(0,123,255,0.1)', color: 'var(--blue)' }}
-                >
-                  Company-Wide
-                </span>
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2
+                className="text-lg font-bold"
+                style={{ color: 'var(--t1)', fontFamily: 'var(--font-display)' }}
+              >
+                {report.month ?? selectedMonthLabel}
+                {mode === 'unified' && (
+                  <span
+                    className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full"
+                    style={{ background: 'rgba(0,123,255,0.1)', color: 'var(--blue)' }}
+                  >
+                    Company-Wide
+                  </span>
+                )}
+              </h2>
+              {cached && (
+                <span className="text-xs" style={{ color: 'var(--t3)' }}>Cached result</span>
               )}
-            </h2>
-            {cached && (
-              <span className="text-xs" style={{ color: 'var(--t3)' }}>
-                Cached result
-              </span>
-            )}
+            </div>
+
+            {/* Export actions */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-semibold transition-colors"
+                style={{ background: 'var(--surface-2)', color: 'var(--t2)', border: '1px solid var(--border)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--t1)' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--t2)' }}
+                title="Download as text file"
+              >
+                <Download size={13} /> Download
+              </button>
+              <button
+                onClick={handleEmail}
+                disabled={emailSending}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-semibold transition-colors disabled:opacity-50"
+                style={{ background: 'rgba(0,123,255,0.08)', color: '#007bff', border: '1px solid rgba(0,123,255,0.2)' }}
+                onMouseEnter={e => !emailSending && ((e.currentTarget as HTMLElement).style.background = 'rgba(0,123,255,0.14)')}
+                onMouseLeave={e => !emailSending && ((e.currentTarget as HTMLElement).style.background = 'rgba(0,123,255,0.08)')}
+                title="Email via n8n webhook"
+              >
+                <Mail size={13} /> {emailSending ? 'Sending…' : 'Email Report'}
+              </button>
+            </div>
           </div>
+
+          {/* Email status */}
+          {emailStatus && (
+            <div
+              className="rounded-xl px-4 py-3 text-[13px] font-medium"
+              style={{
+                background: emailStatus.ok ? 'rgba(5,150,105,0.08)' : 'rgba(217,119,6,0.08)',
+                border: `1.5px solid ${emailStatus.ok ? 'rgba(5,150,105,0.25)' : 'rgba(217,119,6,0.3)'}`,
+                color: emailStatus.ok ? '#059669' : '#b45309',
+              }}
+            >
+              {emailStatus.ok ? '✅ ' : '⚠️ '}{emailStatus.message}
+            </div>
+          )}
           <ReportDisplay report={report} />
         </div>
       )}

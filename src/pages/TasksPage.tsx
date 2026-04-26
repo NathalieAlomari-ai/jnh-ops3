@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { triggerWebhook } from '@/lib/webhook'
+import { supabase } from '@/lib/supabase'
 import type { ShmTask, TaskStatus, TaskPriority } from '@/types/database'
 
 const STATUSES: TaskStatus[] = ['todo', 'in_progress', 'in_review', 'done', 'cancelled']
@@ -69,9 +70,9 @@ function TaskForm({ initial, onClose }: { initial?: Partial<ShmTask>; onClose: (
       await update.mutateAsync({ id: initial.id, updates: payload })
     } else {
       await create.mutateAsync(payload as Omit<ShmTask, 'id' | 'created_at' | 'updated_at'>)
-      // n8n webhook — notify about task assignment
       const assignee = profiles?.find(p => p.id === form.assignee_id)
       if (assignee) {
+        // n8n webhook — fire and forget
         triggerWebhook({
           event: 'task.assigned',
           task: {
@@ -82,6 +83,21 @@ function TaskForm({ initial, onClose }: { initial?: Partial<ShmTask>; onClose: (
             due_date:     payload.due_date,
           },
           assignee: { id: assignee.id, name: assignee.full_name },
+        })
+        // WhatsApp notification via edge function — fire and forget
+        supabase.functions.invoke('notify-task', {
+          body: {
+            task: {
+              title:       payload.title,
+              description: payload.description,
+              priority:    payload.priority,
+              due_date:    payload.due_date,
+            },
+            assignee:    { id: assignee.id, name: assignee.full_name },
+            assigned_by: { id: profile?.id ?? '', name: profile?.full_name ?? 'Someone' },
+          },
+        }).then(({ error }) => {
+          if (error) console.warn('[notify-task] WhatsApp notification failed:', error)
         })
       }
     }

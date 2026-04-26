@@ -15,6 +15,7 @@ import MeetingsPage from '@/pages/MeetingsPage'
 import AdminPage from '@/pages/AdminPage'
 import WeeklySummaryPage from '@/pages/WeeklySummaryPage'
 import MonthlyReportPage from '@/pages/MonthlyReportPage'
+import DocumentsPage from '@/pages/DocumentsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,6 +47,7 @@ export default function App() {
               <Route path="/meetings"        element={<MeetingsPage />} />
               <Route path="/weekly-summary"   element={<WeeklySummaryPage />} />
               <Route path="/monthly-report"  element={<MonthlyReportPage />} />
+              <Route path="/documents"       element={<DocumentsPage />} />
               <Route path="/team"            element={<TeamPage />} />
               <Route
                 path="/admin"

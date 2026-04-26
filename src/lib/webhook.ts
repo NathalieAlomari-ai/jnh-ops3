@@ -15,6 +15,7 @@ export interface MeetingScheduledPayload {
     title: string
     date: string
     time: string
+    end_time?: string
     notes: string
     created_at: string
   }
@@ -36,7 +37,22 @@ export interface TaskAssignedPayload {
   }
 }
 
-export type WebhookPayload = MeetingScheduledPayload | TaskAssignedPayload
+export interface ReportGeneratedPayload {
+  event: 'report.generated'
+  report: {
+    month: string
+    mode: 'individual' | 'unified'
+    executive_summary: string
+    overall_impact: string
+    sections: { tag: string; summary: string; highlights: string[] }[]
+  }
+  recipient: {
+    id: string
+    name: string
+  }
+}
+
+export type WebhookPayload = MeetingScheduledPayload | TaskAssignedPayload | ReportGeneratedPayload
 
 // ─── Core trigger ────────────────────────────────────────────────────────────
 

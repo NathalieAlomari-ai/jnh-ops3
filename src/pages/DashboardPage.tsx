@@ -99,7 +99,7 @@ function AdminDashboard() {
           label="Open Tasks · All Team"
           value={allOpenTasks.length}
           icon={CheckSquare}
-          accent="bg-orange-500"
+          accent="bg-blue-500"
         />
         <StatCard
           label="Standups Today"
@@ -192,7 +192,7 @@ function AdminDashboard() {
               <h2 className="font-semibold text-slate-900 dark:text-white">High-Priority Tasks</h2>
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Urgent & high · all team</p>
             </div>
-            <Badge variant="orange">{urgentAndHigh.length}</Badge>
+            <Badge variant="blue">{urgentAndHigh.length}</Badge>
           </div>
           <CardBody className="p-0">
             {urgentAndHigh.length === 0 ? (
@@ -249,7 +249,7 @@ function UserDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Active Projects"    value={activeProjects} icon={Briefcase}     accent="bg-blue-600"    />
         <StatCard label="Open As-Is Studies" value={openStudies}    icon={GitMerge}      accent="bg-slate-700"   />
-        <StatCard label="My Open Tasks"      value={myOpenTasks.length} icon={CheckSquare} accent="bg-orange-500" />
+        <StatCard label="My Open Tasks"      value={myOpenTasks.length} icon={CheckSquare} accent="bg-blue-500" />
         <StatCard label="Standups Today"     value={standupsToday}  icon={ClipboardList} accent="bg-emerald-600" />
       </div>
 

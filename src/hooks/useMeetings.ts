@@ -12,6 +12,7 @@ export interface Meeting {
   title: string
   date: string          // 'yyyy-MM-dd'
   time: string          // 'HH:mm'
+  end_time: string | null  // 'HH:mm' or null
   attendees: MeetingAttendee[]
   notes: string
   summary: string | null
@@ -36,7 +37,7 @@ export function useMeetings() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('meetings')
-        .select('id, title, date, time, notes, summary, attendees, created_at')
+        .select('id, title, date, time, end_time, notes, summary, attendees, created_at')
         .order('date', { ascending: true })
         .order('time', { ascending: true })
       if (error) throw error
@@ -46,6 +47,7 @@ export function useMeetings() {
         title:       row.title,
         date:        row.date,
         time:        row.time,
+        end_time:    row.end_time ?? null,
         notes:       row.notes ?? '',
         summary:     row.summary ?? null,
         attendees:   row.attendees as MeetingAttendee[],
@@ -61,6 +63,7 @@ export function useMeetings() {
         title:      entry.title,
         date:       entry.date,
         time:       entry.time,
+        end_time:   entry.end_time || null,
         notes:      entry.notes || null,
         attendees:  entry.attendees,
         created_by: entry.created_by,

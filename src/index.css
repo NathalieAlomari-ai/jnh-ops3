@@ -10,49 +10,49 @@
   --font-display: 'Inter', system-ui, sans-serif;
 }
 
-/* ── Claude Design Tokens ────────────────────────────────────── */
+/* ── JNH Systems Design Tokens ───────────────────────────────── */
 :root {
-  /* Brand — Claude orange */
-  --orange:          #d97706;
-  --orange-hover:    #b45309;
-  --orange-light:    #f59e0b;
-  --orange-dim:      rgba(217,119,6,0.12);
+  /* Brand — JNH blue */
+  --orange:          #2563eb;
+  --orange-hover:    #1d4ed8;
+  --orange-light:    #3b82f6;
+  --orange-dim:      rgba(37,99,235,0.10);
 
   /* Gradient */
-  --g-brand:         linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
-  --g-brand-hover:   linear-gradient(135deg, #b45309 0%, #d97706 100%);
+  --g-brand:         linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+  --g-brand-hover:   linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
 
-  /* Sidebar — Claude dark charcoal */
-  --sb-bg:           #1a1a1a;
+  /* Sidebar — JNH dark navy */
+  --sb-bg:           #0f172a;
   --sb-hover:        rgba(255,255,255,0.05);
-  --sb-active-bg:    rgba(217,119,6,0.10);
-  --sb-active-bar:   #d97706;
-  --sb-text:         #8a8a8a;
-  --sb-text-active:  #f0ece4;
+  --sb-active-bg:    rgba(37,99,235,0.12);
+  --sb-active-bar:   #2563eb;
+  --sb-text:         #94a3b8;
+  --sb-text-active:  #f0f4ff;
   --sb-label:        rgba(255,255,255,0.20);
   --sb-divider:      rgba(255,255,255,0.07);
 
-  /* Page — Claude warm off-white */
-  --bg:              #faf9f7;
+  /* Page — cool white */
+  --bg:              #f8fafc;
   --surface:         #ffffff;
-  --surface-2:       #f5f4f1;
-  --border:          #e9e7e3;
-  --border-strong:   #d5d3ce;
+  --surface-2:       #f1f5f9;
+  --border:          #e2e8f0;
+  --border-strong:   #cbd5e1;
 
   /* Text */
-  --t1:              #1a1a1a;
-  --t2:              #5a5a5a;
-  --t3:              #a0a0a0;
+  --t1:              #0f172a;
+  --t2:              #475569;
+  --t3:              #94a3b8;
 
   /* Shadows */
   --shadow-xs:       0 1px 2px rgba(0,0,0,0.04);
   --shadow-sm:       0 1px 4px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
   --shadow-md:       0 4px 16px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.03);
-  --shadow-orange:   0 4px 16px rgba(217,119,6,0.22);
-  --shadow-orange-lg: 0 8px 28px rgba(217,119,6,0.28);
+  --shadow-orange:   0 4px 16px rgba(37,99,235,0.18);
+  --shadow-orange-lg: 0 8px 28px rgba(37,99,235,0.22);
 
   /* Ring */
-  --ring:            rgba(217,119,6,0.30);
+  --ring:            rgba(37,99,235,0.30);
 }
 
 /* ── Reset ───────────────────────────────────────────────────── */
@@ -113,11 +113,11 @@ input, textarea, select {
 /* ── Scrollbar ───────────────────────────────────────────────── */
 ::-webkit-scrollbar          { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track    { background: transparent; }
-::-webkit-scrollbar-thumb    { background: #d5d3ce; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
+::-webkit-scrollbar-thumb    { background: #cbd5e1; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* ── Selection ───────────────────────────────────────────────── */
-::selection { background: rgba(217,119,6,0.14); color: #7c3a00; }
+::selection { background: rgba(37,99,235,0.14); color: #1e3a8a; }
 
 /* ════════════════════════════════════════════════════════════════
    DARK MODE — complete token overrides
@@ -125,25 +125,25 @@ input, textarea, select {
 .dark {
   color-scheme: dark;
 
-  /* Page layers — Claude dark */
-  --bg:              #1a1a1a;
-  --surface:         #262626;
-  --surface-2:       #2e2e2e;
+  /* Page layers — dark */
+  --bg:              #0f172a;
+  --surface:         #1e293b;
+  --surface-2:       #263248;
   --border:          rgba(255, 255, 255, 0.08);
   --border-strong:   rgba(255, 255, 255, 0.14);
 
   /* Text */
-  --t1:    #ece9e1;
-  --t2:    #8a8a8a;
-  --t3:    #555555;
+  --t1:    #e2e8f0;
+  --t2:    #94a3b8;
+  --t3:    #475569;
 
-  /* Sidebar — darker variant in dark mode */
-  --sb-bg:          #111111;
+  /* Sidebar — deeper navy in dark mode */
+  --sb-bg:          #0a1120;
   --sb-hover:       rgba(255,255,255,0.05);
-  --sb-active-bg:   rgba(217,119,6,0.14);
-  --sb-active-bar:  #d97706;
-  --sb-text:        #666666;
-  --sb-text-active: #ece9e1;
+  --sb-active-bg:   rgba(37,99,235,0.16);
+  --sb-active-bar:  #3b82f6;
+  --sb-text:        #64748b;
+  --sb-text-active: #e2e8f0;
   --sb-label:       rgba(255,255,255,0.18);
   --sb-divider:     rgba(255,255,255,0.06);
 
@@ -151,11 +151,11 @@ input, textarea, select {
   --shadow-xs:        0 1px 2px rgba(0,0,0,0.60);
   --shadow-sm:        0 1px 4px rgba(0,0,0,0.50), 0 1px 2px rgba(0,0,0,0.40);
   --shadow-md:        0 4px 16px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.40);
-  --shadow-orange:    0 4px 20px rgba(217,119,6,0.35);
-  --shadow-orange-lg: 0 8px 32px rgba(217,119,6,0.40);
+  --shadow-orange:    0 4px 20px rgba(37,99,235,0.30);
+  --shadow-orange-lg: 0 8px 32px rgba(37,99,235,0.35);
 
   /* Focus ring */
-  --ring: rgba(217,119,6,0.35);
+  --ring: rgba(37,99,235,0.35);
 }
 
 /* ── Dark: body ────────────────────────────────────────────────── */
@@ -185,9 +185,9 @@ input, textarea, select {
 
 /* Text */
 .dark .text-gray-900, .dark .text-slate-900 { color: var(--t1) !important; }
-.dark .text-gray-700, .dark .text-slate-700 { color: #d4cfc6 !important; }
+.dark .text-gray-700, .dark .text-slate-700 { color: #cbd5e1 !important; }
 .dark .text-gray-600, .dark .text-slate-600 { color: var(--t2) !important; }
-.dark .text-gray-500, .dark .text-slate-500 { color: #777777 !important; }
+.dark .text-gray-500, .dark .text-slate-500 { color: #64748b !important; }
 .dark .text-gray-400, .dark .text-slate-400 { color: var(--t3) !important; }
 
 /* Borders */
@@ -200,17 +200,17 @@ input, textarea, select {
 .dark [style*="border-b"] { border-color: var(--border) !important; }
 
 /* Avatars / colored chips — keep vibrant on dark */
-.dark .bg-blue-50  { background-color: rgba(99,102,241,0.12) !important; }
+.dark .bg-blue-50  { background-color: rgba(37,99,235,0.12) !important; }
 .dark .bg-emerald-50 { background-color: rgba(5,150,105,0.12) !important; }
-.dark .bg-orange-50  { background-color: rgba(217,119,6,0.12) !important; }
+.dark .bg-orange-50  { background-color: rgba(37,99,235,0.10) !important; }
 
 /* Scrollbar on dark */
-.dark ::-webkit-scrollbar-thumb { background: #383838; }
-.dark ::-webkit-scrollbar-thumb:hover { background: #555555; }
+.dark ::-webkit-scrollbar-thumb { background: #1e293b; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #334155; }
 
 /* Selection on dark */
-.dark ::selection { background: rgba(217,119,6,0.28); color: #f5e0b8; }
+.dark ::selection { background: rgba(37,99,235,0.28); color: #bfdbfe; }
 
 /* ── Dark: form labels */
-.dark .text-slate-700 { color: #d4cfc6 !important; }
+.dark .text-slate-700 { color: #cbd5e1 !important; }
 .dark label { color: var(--t2) !important; }

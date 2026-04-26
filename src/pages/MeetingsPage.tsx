@@ -23,7 +23,7 @@ function dateLabel(date: string): { label: string; variant: 'green' | 'blue' | '
   return { label: format(d, 'MMM d'), variant: 'blue' }
 }
 
-const AVATAR_COLORS = ['#007bff','#0cc0df','#7c3aed','#059669','#db2777','#d97706']
+const AVATAR_COLORS = ['#007bff','#0cc0df','#7c3aed','#059669','#db2777','#2563eb']
 function avatarColor(i: number) { return AVATAR_COLORS[i % AVATAR_COLORS.length] }
 
 // ─── Multi-Attendee Picker ────────────────────────────────────────────────────
@@ -152,6 +152,7 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
   const [title, setTitle]           = useState('')
   const [date, setDate]             = useState(todayStr)
   const [time, setTime]             = useState(nowTime)
+  const [endTime, setEndTime]       = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [notes, setNotes]           = useState('')
   const [saving, setSaving]         = useState(false)
@@ -178,10 +179,10 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
 
     // Phase 1: save the meeting
     setSaving(true)
-    const meeting = addMeeting({ title: autoTitle, date, time, attendees, notes, summary: null })
+    const meeting = addMeeting({ title: autoTitle, date, time, end_time: endTime || null, attendees, notes, summary: null })
     setSaving(false)
 
-    // n8n webhook — fire and forget (unchanged)
+    // n8n webhook — fire and forget
     triggerWebhook({
       event: 'meeting.scheduled',
       meeting: {
@@ -189,6 +190,7 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
         title:      meeting.title,
         date:       meeting.date,
         time:       meeting.time,
+        end_time:   meeting.end_time ?? undefined,
         notes:      meeting.notes,
         created_at: meeting.created_at,
       },
@@ -200,7 +202,7 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
     try {
       const { data, error } = await supabase.functions.invoke('notify-meeting', {
         body: {
-          meeting: { title: meeting.title, date: meeting.date, time: meeting.time, notes: meeting.notes },
+          meeting: { title: meeting.title, date: meeting.date, time: meeting.time, end_time: meeting.end_time, notes: meeting.notes },
           attendees,
         },
       })
@@ -254,24 +256,26 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
         )}
       </div>
 
-      {/* Date + Time */}
+      {/* Date */}
+      <div>
+        <label className="block text-[12px] font-semibold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
+          Date <span className="text-red-500">*</span>
+        </label>
+        <input
+          required
+          type="date"
+          className={inputCls}
+          value={date}
+          onChange={e => setDate(e.target.value)}
+          style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--t1)' }}
+        />
+      </div>
+
+      {/* Start + End Time */}
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-[12px] font-semibold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
-            Date <span className="text-red-500">*</span>
-          </label>
-          <input
-            required
-            type="date"
-            className={inputCls}
-            value={date}
-            onChange={e => setDate(e.target.value)}
-            style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--t1)' }}
-          />
-        </div>
-        <div>
-          <label className="block text-[12px] font-semibold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
-            Time <span className="text-red-500">*</span>
+            Start Time <span className="text-red-500">*</span>
           </label>
           <input
             required
@@ -279,6 +283,18 @@ function ScheduleForm({ onClose }: { onClose: () => void }) {
             className={inputCls}
             value={time}
             onChange={e => setTime(e.target.value)}
+            style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--t1)' }}
+          />
+        </div>
+        <div>
+          <label className="block text-[12px] font-semibold uppercase tracking-wide mb-1.5" style={{ color: 'var(--t3)' }}>
+            End Time
+          </label>
+          <input
+            type="time"
+            className={inputCls}
+            value={endTime}
+            onChange={e => setEndTime(e.target.value)}
             style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--t1)' }}
           />
         </div>
@@ -523,11 +539,17 @@ function MeetingCard({ meeting, onDelete }: { meeting: Meeting; onDelete: () => 
             </div>
 
             <div className="flex flex-wrap items-center gap-4 text-xs" style={{ color: 'var(--t2)' }}>
+              {/* Time range */}
               <span className="flex items-center gap-1.5">
                 <Clock size={12} style={{ color: 'var(--t3)' }} />
-                {meeting.time}
+                <span className="font-medium" style={{ color: 'var(--t1)' }}>
+                  {meeting.time}
+                  {meeting.end_time && (
+                    <> <span style={{ color: 'var(--t3)' }}>→</span> {meeting.end_time}</>
+                  )}
+                </span>
               </span>
-              {/* Attendee avatars */}
+              {/* Attendee avatars + full names */}
               <span className="flex items-center gap-1.5">
                 <Users size={12} style={{ color: 'var(--t3)' }} />
                 <div className="flex -space-x-1">
@@ -550,7 +572,9 @@ function MeetingCard({ meeting, onDelete }: { meeting: Meeting; onDelete: () => 
                     </div>
                   )}
                 </div>
-                <span>{meeting.attendees.map(a => a.name.split(' ')[0]).join(', ')}</span>
+                <span title={meeting.attendees.map(a => a.name).join(', ')}>
+                  {meeting.attendees.map(a => a.name).join(', ')}
+                </span>
               </span>
             </div>
 

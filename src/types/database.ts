@@ -5,6 +5,8 @@
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[]
 
 export type UserRole = 'admin' | 'user'
+export type DealPriority = 'low' | 'medium' | 'high'
+export type DealStatus = 'active' | 'stalled' | 'won' | 'lost'
 export type InitiativeStatus = 'planning' | 'in_progress' | 'on_hold' | 'completed' | 'cancelled'
 export type TaskStatus = 'todo' | 'in_progress' | 'in_review' | 'done' | 'cancelled'
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
@@ -119,6 +121,11 @@ export interface ShmOutreach {
   notes: string | null
   last_contact_date: string | null
   owner_id: string
+  deal_value: number | null
+  priority: DealPriority
+  next_followup_date: string | null
+  deal_status: DealStatus
+  linked_initiative_id: string | null
   created_at: string
   updated_at: string
 }
